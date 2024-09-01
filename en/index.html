@@ -666,33 +666,57 @@ window.onload = parseData;
 		document.getElementById('range-select').value = 'all'; // 重置下拉選單
 	}
 
+function showWordList() {
+    const modal = document.getElementById('word-list-modal');
+    const tableBody = document.querySelector('#word-list-table tbody');
+    const tableHead = document.querySelector('#word-list-table thead');
+    tableBody.innerHTML = '';
+    tableHead.innerHTML = '';
 
-	function showWordList() {
-		const modal = document.getElementById('word-list-modal');
-		const tableBody = document.querySelector('#word-list-table tbody');
-		tableBody.innerHTML = '';
+    // 獲取數據的標題行
+    const headers = customData ? customData.trim().split('\n')[0].split('\t') : data.trim().split('\n')[0].split('\t');
 
-		let wordsToShow = selectedRange === 'all' ? words : getAvailableWords(selectedRange);
+    // 創建表頭
+    const headerRow = tableHead.insertRow();
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        headerRow.appendChild(th);
+    });
 
-		wordsToShow.forEach(word => {
-			const row = tableBody.insertRow();
-			const cellEnglish = row.insertCell(0);
-			const cellKK = row.insertCell(1);
-			const cellChinese = row.insertCell(2);
+    let wordsToShow = selectedRange === 'all' ? words : getAvailableWords(selectedRange);
 
-			cellEnglish.innerHTML = colorizeEnglishWord(word.english);
-			cellEnglish.className = 'clickable';
-			cellEnglish.onclick = () => speakWord(word.english);
+    wordsToShow.forEach(word => {
+        const row = tableBody.insertRow();
+        
+        headers.forEach(header => {
+            const cell = row.insertCell();
+            let content = '';
 
-			cellKK.innerHTML = colorizeKKPhonetic(word.kk);
-			cellKK.className = 'clickable';
-			cellKK.onclick = () => speakWord(word.english);
+            // 根據不同的可能的標題名稱來獲取內容
+            if (header === '日期' || header === '分類') content = word.date;
+            else if (header === '英文' || header === 'English' || header === 'ENGLISH' || header === '英語') content = word.english;
+            else if (header === 'KK音標' || header === 'KK' || header === 'KK 音標') content = word.kk;
+            else if (header === '中文釋義' || header === '中文' || header === 'Chinese' || header === 'chinese' || header === '華語') content = word.chinese;
+            else if (header === '詞性') content = word.partOfSpeech; // 假設詞性存儲在 partOfSpeech 屬性中
+            else content = word[header.toLowerCase()] || ''; // for any other headers
 
-			cellChinese.textContent = word.chinese;
-		});
+            if (header === '英文' || header === 'English' || header === 'ENGLISH' || header === '英語') {
+                cell.innerHTML = colorizeEnglishWord(content);
+                cell.className = 'clickable';
+                cell.onclick = () => speakWord(content);
+            } else if (header === 'KK音標' || header === 'KK' || header === 'KK 音標') {
+                cell.innerHTML = colorizeKKPhonetic(content);
+                cell.className = 'clickable';
+                cell.onclick = () => speakWord(word.english);
+            } else {
+                cell.textContent = content;
+            }
+        });
+    });
 
-		modal.style.display = 'block';
-	}
+    modal.style.display = 'block';
+}
 
 function closeWordList() {
     const modal = document.getElementById('word-list-modal');
