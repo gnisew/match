@@ -60,29 +60,30 @@
         .card.matched {
             background-color: #e0e0e0;
         }
-.pair-button {
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;  /* 更淺的邊框顏色 */
-    color: #333;
-    padding: 10px 20px;
-    margin: 5px;
-    cursor: pointer;
-    border-radius: 5px;  /* 圓角 */
-    transition: all 0.3s ease;  /* 平滑過渡效果 */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);  /* 輕微陰影代替明顯的邊框 */
-}
+		.pair-button {
+			background-color: #f0f0f0;
+			border: 1px solid #ccc;  /* 更淺的邊框顏色 */
+			color: #333;
+			padding: 10px 20px;
+			margin: 5px;
+			cursor: pointer;
+			border-radius: 5px;  /* 圓角 */
+			transition: all 0.3s ease;  /* 平滑過渡效果 */
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);  /* 輕微陰影代替明顯的邊框 */
+		}
 
-.pair-button:hover {
-    background-color: #e0e0e0;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
+		.pair-button:hover {
+			background-color: #e0e0e0;
+			box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+		}
 
-.pair-button.selected {
-    background-color: #4a90e2;  /* 選中時的顏色 */
-    color: white;
-    border-color: #3a80d2;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
+		.pair-button.selected {
+			background-color: #4a90e2;  /* 選中時的顏色 */
+			color: white;
+			border-color: #3a80d2;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+		}
+
         .vowel { color: #AA0000; }
         .semivowel { color: #4B0082; }
         .consonant { color: #0000AA; }
@@ -142,6 +143,69 @@
 		#show-custom-wordlist-btn {
 			display: inline-block;
 		}
+
+
+        #view-words-btn {
+            margin-left: 10px;
+        }
+        
+        #word-list-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 800px;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        #word-list-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        #word-list-table th, #word-list-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        #word-list-table th {
+            background-color: #f2f2f2;
+        }
+        
+        .clickable {
+            cursor: pointer;
+            color: #0000FF;
+            text-decoration: none;
+        }
+
     </style>
 </head>
 <body>
@@ -173,27 +237,99 @@
                 <option value="all">全部</option>
             </select>
             <button onclick="startGame()">開始遊戲</button>
+			<button id="view-words-btn" onclick="showWordList()">檢視語詞</button>
         </div>
         <div id="game-board" style="display: none;"></div>
         <div id="game-controls" style="display: none;">
             <button onclick="continueGame()">繼續</button>
             <button onclick="returnToSetup()">返回</button>
         </div>
+
+
+        <div id="word-list-modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeWordList()">&times;</span>
+                <h2>詞表</h2>
+                <table id="word-list-table">
+                    <thead>
+                        <tr>
+                            <th>英文</th>
+                            <th>KK音標</th>
+                            <th>中文釋義</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 表格內容將由 JavaScript 動態生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <script>
     const data = `
-日期	英文	中文釋義	KK音標
-Aug. 1, 2	barbecue	烤肉；烤肉聚會	['bɑrbɪkju]
-Aug. 1, 2	drink	飲料	[drɪŋk]
-Aug. 1, 2	hot dog	熱狗	[hɑt][dɔg]
-Aug. 1, 2	burger	漢堡；漢堡牛肉餅	['bɝgɚ]
-Aug. 1, 2	remember	記得	[rɪ'mɛmbɚ]
-Aug. 1, 2	meat	肉（可食用的）	[mit]
-Aug. 1, 2	vegetable	蔬菜	['vɛdʒtəbəl]
-Aug. 2, 5	corn	玉米	[kɔrn]
-Aug. 2, 5	salad	(蔬菜)沙拉	['sæləd]
-Aug. 2, 5	watermelon	西瓜	['wɔtɚ,mɛlən]
+日期	英文	KK音標	中文釋義	詞性
+2	quiet	['kwaɪt]	安靜的	adj
+2	tank	[tæŋk]	容器（盛放液體或氣體）	n
+2	tail	[tel]	尾巴	n
+2	shrimp	[ʃrɪmp]	蝦子	n
+2	plant	[plænt]	植物	n
+3	subject	['sʌbdʒɪkt]	科目（學校）	n
+3	sleep in	[slip][ɪn]	睡到自然醒	phr v
+3	text	[tekst]	給...傳簡訊	v
+3	breathe	[brið]	呼吸	v
+3	relax	[rɪ'læks]	放輕鬆；(使)放鬆	v
+4	horrible	['hɔrəbəl]	極糟的；令人不快的	adj
+4	online	['ɑn laɪn]	在網路上	adv
+4	mean	[min]	卑鄙的；刻薄的	adj
+4	brave	[brev]	勇敢的	adj
+4	finally	['faɪnəli]	終於；最後	adv
+5	island	['aɪlənd]	島嶼	n
+5	million	['mɪljən]	(一)百萬	n
+5	meter	['mitər]	公尺	n
+5	pork	[pɔrk]	豬肉	n
+5	sound	[saund]	聽起來	v
+6	film	[fɪlm]	拍攝(影片)	v
+6	rock	[rɑk]	石頭；岩石	n
+6	equipment	[ɪ'kwɪpmənt]	裝備	n
+6	hunt	[hʌnt]	獵捕	v
+6	glad	[glæd]	高興的	adj
+9	sweet	[swit]	甜的	adj
+9	different	['dɪfərənt]	不同的	adj
+9	green	[grin]	綠色的	adj
+9	expensive	[ɪk'spensɪv]	昂貴的	adj
+9	slice	[slaɪs]	把...切成薄片	v
+10	on sale	[ɑn][sel]	特價；拍賣	idiom
+10	pie	[paɪ]	派；餡餅	n
+10	bake	[bek]	烘烤	v
+10	else	[els]	其他，別的	adj
+10	simple	['sɪmpəl]	簡單的	adj
+11	farmer	['fɑrmər]	農夫	n
+11	grow	[gro]	生長	v
+11	notice	['notɪs]	注意到	v
+11	wish	[wɪʃ]	想要；希望	v
+11	reward	[rɪ'wɔrd]	獎賞	n
+12	double	['dʌbəl]	加一倍	v
+12	shall	[ʃæl]	表某事肯定或必須會發生	aux. v
+12	clever	['klevər]	聰明的	adj
+12	deliver	[dɪ'lɪvər]	運送	v
+12	final	['faɪnəl]	最後的	adj
+13	hang up	[hæŋ][ʌp]	掛斷(電話)	phr v
+13	hang out	[hæŋ][aʊt]	與...在一起消磨時間	phr v
+13	hang on to	[hæŋ][ɑn][tu]	保住；抓緊	idiom
+13	hang it up	[hæŋ][ɪt][ʌp]	放棄；退出	idiom
+13	hang in there	[hæŋ][ɪn][ðer]	堅持住	idiom
+16	smooth	[smuð]	平滑的	adj
+16	paint	[pent]	顏料；塗料	n
+16	brush	[brʌʃ]	畫筆；刷子	n
+16	photo	['foto]	照片	n
+16	between	[bɪ'twin]	在...之間	prep
+17	race	[res]	(使)參加比賽；賽跑	v
+17	engine	['endʒɪn]	引擎	n
+17	fast	[fæst]	快速地	adv
+17	kilometer	[kɪ'lɑmɪtər]	公里	n
+17	driver	['draɪvər]	駕駛；司機	n
 `;
 
 
@@ -415,7 +551,7 @@ window.onload = parseData;
 
 
 function colorizeKKPhonetic(kk) {
-    const vowels = ['ɑ', 'æ', 'ɛ', 'e', 'ɪ', 'i', 'ɔ', 'o', 'ʊ', 'u', 'ʌ', 'ə', 'ɚ', 'ɝ'];
+    const vowels = ['a', 'ɑ', 'æ', 'ɛ', 'e', 'ɪ', 'i', 'ɔ', 'o', 'ʊ', 'u', 'ʌ', 'ə', 'ɚ', 'ɝ'];
     const semivowels = ['j', 'w'];
     const specialChars = ['[', ']', ',', "'", ' '];
 
@@ -528,15 +664,70 @@ function colorizeKKPhonetic(kk) {
         startGame();
     }
 
-    function returnToSetup() {
-        document.getElementById('game-board').style.display = 'none';
-        document.getElementById('game-controls').style.display = 'none';
-        document.getElementById('setup').style.display = 'block';
-        document.getElementById('return-button').style.display = 'none';
-        document.getElementById('stats').style.display = 'none';
+	function returnToSetup() {
+		document.getElementById('game-board').style.display = 'none';
+		document.getElementById('game-controls').style.display = 'none';
+		document.getElementById('setup').style.display = 'block';
+		document.getElementById('return-button').style.display = 'none';
+		document.getElementById('stats').style.display = 'none';
 		document.getElementById('show-custom-wordlist-btn').style.display = 'inline-block';
-        clearInterval(timerInterval);
+		clearInterval(timerInterval);
+		usedWords.clear(); // 清除已使用的單詞集合
+		selectedRange = 'all'; // 重置選擇的範圍
+		document.getElementById('range-select').value = 'all'; // 重置下拉選單
+	}
+
+
+
+	function showWordList() {
+		const modal = document.getElementById('word-list-modal');
+		const tableBody = document.querySelector('#word-list-table tbody');
+		tableBody.innerHTML = ''; // 清空現有內容
+
+		let wordsToShow = selectedRange === 'all' ? words : getAvailableWords(selectedRange);
+
+		wordsToShow.forEach(word => {
+			const row = tableBody.insertRow();
+			const cellEnglish = row.insertCell(0);
+			const cellKK = row.insertCell(1);
+			const cellChinese = row.insertCell(2);
+
+			cellEnglish.innerHTML = colorizeEnglishWord(word.english);
+			cellEnglish.className = 'clickable';
+			cellEnglish.onclick = () => speakWord(word.english);
+
+			cellKK.innerHTML = colorizeKKPhonetic(word.kk);
+			cellKK.className = 'clickable';
+			cellKK.onclick = () => speakWord(word.english);
+
+			cellChinese.textContent = word.chinese;
+		});
+
+		modal.style.display = 'block';
+	}
+
+function closeWordList() {
+    const modal = document.getElementById('word-list-modal');
+    modal.style.display = 'none';
+}
+
+// 當用戶點擊模態框外部時關閉模態框
+window.onclick = function(event) {
+    const modal = document.getElementById('word-list-modal');
+    if (event.target == modal) {
+        modal.style.display = 'none';
     }
+}
+
+// 更新 updateSelectedRange 函數以在範圍改變時刷新詞表
+function updateSelectedRange() {
+    selectedRange = document.getElementById('range-select').value;
+    if (document.getElementById('word-list-modal').style.display === 'block') {
+        showWordList(); // 如果詞表正在顯示，則刷新它
+    }
+}
+
+
 
     // 初始化
     parseData();
