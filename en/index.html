@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🥷烏衣行英語配對遊戲</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #game-container {
+            text-align: center;
+        }
+		#game-board {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 10px;
+			margin-top: 20px;
+		}
+		/* 手機版面調整 */
+		@media (max-width: 600px) {
+			#game-board {
+				grid-template-columns: repeat(2, 1fr);
+			}
+			.card {
+			   padding: 15px !important;
+			   font-size: 16px !important;
+			}
+		}
+        .card:hover {
+            background-color: #e0e0e0;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #range-select {
+            margin: 10px;
+            padding: 13px 15px;
+            font-size: 16px;
+        }
+        .card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+			font-size: 24px;
+        }
+        .card.flipped {
+            background-color: #ffff99;
+        }
+        .card.matched {
+            background-color: #e0e0e0;
+        }
+.pair-button {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;  /* 更淺的邊框顏色 */
+    color: #333;
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;  /* 圓角 */
+    transition: all 0.3s ease;  /* 平滑過渡效果 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);  /* 輕微陰影代替明顯的邊框 */
+}
+
+.pair-button:hover {
+    background-color: #e0e0e0;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.pair-button.selected {
+    background-color: #4a90e2;  /* 選中時的顏色 */
+    color: white;
+    border-color: #3a80d2;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+        .vowel { color: #AA0000; }
+        .semivowel { color: #4B0082; }
+        .consonant { color: #0000AA; }
+        #return-button {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        #stats {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 16px;
+            display: none;
+        }
+        @keyframes jumpAnimation {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes shakeAnimation {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-3px); }
+            75% { transform: translateX(3px); }
+        }
+
+        .jump {
+            animation: jumpAnimation 0.3s ease;
+        }
+
+        .shake {
+            animation: shakeAnimation 0.3s ease;
+        }
+
+		#custom-wordlist-container {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			background-color: white;
+			padding: 20px;
+			border: 1px solid #ccc;
+			box-shadow: 0 0 10px rgba(0,0,0,0.1);
+			z-index: 1000;
+		}
+
+		#custom-wordlist-btn-container {
+			width: 100%;
+			text-align: center;
+			margin: 10px 0;
+		}
+
+		#show-custom-wordlist-btn {
+			display: inline-block;
+		}
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <button id="return-button" style="display: none;" onclick="returnToSetup()">X</button>
+        <div id="stats">
+            時間：<span id="time">00:00</span><br>
+            正確率：<span id="accuracy">100%</span>
+        </div>
+        <h1>🥷烏衣行英語配對遊戲</h1>
+
+		<div id="custom-wordlist-container" style="display: none;">
+			<h2>輸入自訂語詞表</h2>
+			<textarea id="custom-wordlist" rows="10" cols="50" placeholder="請輸入自訂語詞表，格式為：英文\t中文\n每行一個單詞對"></textarea>
+			<br>
+			<button onclick="clearCustomWordlist()">清除</button>
+			<button onclick="closeCustomWordlist()">關閉</button>
+			<button onclick="saveCustomWordlist()">確認</button>
+		</div>		
+
+        <div id="setup">
+			<div id="custom-wordlist-btn-container">
+				<button id="show-custom-wordlist-btn" onclick="showCustomWordlist()">自訂語詞表</button>
+			</div>
+            <h2>選擇配對項目：</h2>			
+
+            <h2>選擇範圍：</h2>			
+            <select id="range-select" onchange="updateSelectedRange()">
+                <option value="all">全部</option>
+            </select>
+            <button onclick="startGame()">開始遊戲</button>
+        </div>
+        <div id="game-board" style="display: none;"></div>
+        <div id="game-controls" style="display: none;">
+            <button onclick="continueGame()">繼續</button>
+            <button onclick="returnToSetup()">返回</button>
+        </div>
+    </div>
+
+    <script>
+    const data = `
+日期	英文	中文釋義	KK音標
+Aug. 1, 2	barbecue	烤肉；烤肉聚會	['bɑrbɪkju]
+Aug. 1, 2	drink	飲料	[drɪŋk]
+Aug. 1, 2	hot dog	熱狗	[hɑt][dɔg]
+Aug. 1, 2	burger	漢堡；漢堡牛肉餅	['bɝgɚ]
+Aug. 1, 2	remember	記得	[rɪ'mɛmbɚ]
+Aug. 1, 2	meat	肉（可食用的）	[mit]
+Aug. 1, 2	vegetable	蔬菜	['vɛdʒtəbəl]
+Aug. 2, 5	corn	玉米	[kɔrn]
+Aug. 2, 5	salad	(蔬菜)沙拉	['sæləd]
+Aug. 2, 5	watermelon	西瓜	['wɔtɚ,mɛlən]
+`;
+
+
+    let startTime;
+    let timerInterval;
+    let attempts = 0;
+    let correctMatches = 0;
+
+    let words = [];
+    let dates = [];
+    let selectedPair = ['english', 'chinese'];
+    let selectedRange = 'all';
+    let currentPairs = [];
+    let flippedCards = [];
+    let usedWords = new Set();
+
+    const rightSound = new Audio('right.mp3');
+    const wrongSound = new Audio('wrong.mp3');
+
+
+let customData = '';
+
+function showCustomWordlist() {
+    document.getElementById('custom-wordlist-container').style.display = 'block';
+    document.getElementById('show-custom-wordlist-btn').style.display = 'none';
+}
+
+function closeCustomWordlist() {
+    document.getElementById('custom-wordlist-container').style.display = 'none';
+    document.getElementById('show-custom-wordlist-btn').style.display = 'inline-block';
+}
+
+function saveCustomWordlist() {
+    customData = document.getElementById('custom-wordlist').value;
+    closeCustomWordlist();
+    parseData();  // 重新解析數據
+}
+
+function clearCustomWordlist() {
+    document.getElementById('custom-wordlist').value = '';
+    customData = '';
+    parseData();  // 重新解析數據
+}
+
+
+// 修改parseData函數以處理自訂數據
+function parseData() {
+    const dataToUse = customData || data;  // 如果有自訂數據，使用自訂數據，否則使用默認數據
+    const lines = dataToUse.trim().split('\n');
+    const headers = lines[0].split('\t');
+    
+    // 重置全局變量
+    words = [];
+    dates = [];
+    selectedPair = ['english', 'chinese'];  // 默認為英文-中文
+    
+    // 檢查標題並決定可用的配對選項
+    const hasKK = headers.includes('KK音標');
+    const hasDate = headers.includes('日期');
+    
+    // 生成配對選項按鈕
+    const setupDiv = document.getElementById('setup');
+    const pairButtons = setupDiv.querySelector('h2:first-of-type').nextElementSibling;
+    pairButtons.innerHTML = '<button id="en-ch" class="pair-button selected" onclick="selectPair(\'english\', \'chinese\')">英語 - 中文</button>';
+    
+    if (hasKK) {
+        pairButtons.innerHTML += '<button id="en-kk" class="pair-button" onclick="selectPair(\'english\', \'kk\')">英語 - KK音標</button>';
+        pairButtons.innerHTML += '<button id="kk-ch" class="pair-button" onclick="selectPair(\'kk\', \'chinese\')">KK音標 - 中文</button>';
+    }
+    
+    // 處理日期範圍選擇
+    const rangeSelect = document.getElementById('range-select');
+    rangeSelect.innerHTML = '<option value="all">全部</option>';
+    
+    let currentDate = '';  // 用於存儲當前日期
+
+    // 解析數據
+    lines.slice(1).forEach(line => {
+        const parts = line.split('\t');
+        const wordObj = {};
+        
+        headers.forEach((header, index) => {
+            if (header === '日期' || header === '分類') {
+                if (parts[index].trim() !== '') {
+                    currentDate = parts[index];
+                    if (!dates.includes(currentDate)) {
+                        dates.push(currentDate);
+                    }
+                }
+                wordObj.date = currentDate;
+            } else if (header === '英文' || header === 'English' || header === 'ENGLISH' || header === '英語') {
+                wordObj.english = parts[index];
+            } else if (header === 'KK音標' || header === 'KK' || header === 'KK 音標') {
+                wordObj.kk = parts[index];
+            } else if (header === '中文釋義' || header === '中文' || header === 'Chinese' || header === 'chinese' || header === '華語' ) {
+                wordObj.chinese = parts[index];
+            }
+        });
+        
+        if (wordObj.english && wordObj.chinese) {  // 確保至少有英文和中文才添加到單詞列表
+            words.push(wordObj);
+        }
+    });
+    
+    // 如果有日期，添加到下拉選單
+    if (hasDate) {
+        dates.forEach(date => {
+            const option = document.createElement('option');
+            option.value = date;
+            option.textContent = date;
+            rangeSelect.appendChild(option);
+        });
+    } else {
+        // 如果沒有日期，生成每10個單詞一組的選項
+        const groups = Math.ceil(words.length / 10);
+        for (let i = 0; i < groups; i++) {
+            const option = document.createElement('option');
+            option.value = `group${i + 1}`;
+            option.textContent = `第 ${i * 10 + 1} - ${Math.min((i + 1) * 10, words.length)} 個單詞`;
+            rangeSelect.appendChild(option);
+        }
+    }
+}
+
+
+// 根據選擇的範圍獲取可用單詞
+function getAvailableWords(selectedRange) {
+    if (selectedRange === 'all') {
+        return words.filter(word => !usedWords.has(word.english));
+    } else if (selectedRange.startsWith('group')) {
+        const groupNumber = parseInt(selectedRange.slice(5)) - 1;
+        const start = groupNumber * 10;
+        const end = Math.min((groupNumber + 1) * 10, words.length);
+        return words.slice(start, end).filter(word => !usedWords.has(word.english));
+    } else {
+        return words.filter(word => word.date === selectedRange && !usedWords.has(word.english));
+    }
+}
+
+// 在頁面加載時調用 parseData
+window.onload = parseData;
+
+    function populateDateDropdown() {
+        const dropdown = document.getElementById('range-select');
+        dates.forEach(date => {
+            const option = document.createElement('option');
+            option.value = date;
+            option.textContent = date;
+            dropdown.appendChild(option);
+        });
+    }
+
+    function selectPair(first, second) {
+        selectedPair = [first, second];
+        document.querySelectorAll('.pair-button').forEach(btn => btn.classList.remove('selected'));
+        document.getElementById(`${first.slice(0,2)}-${second.slice(0,2)}`).classList.add('selected');
+    }
+
+    function updateSelectedRange() {
+        selectedRange = document.getElementById('range-select').value;
+    }
+
+	function startGame() {
+		document.getElementById('setup').style.display = 'none';
+		document.getElementById('game-board').style.display = 'grid';
+		document.getElementById('game-controls').style.display = 'none';
+		document.getElementById('return-button').style.display = 'block';
+		document.getElementById('stats').style.display = 'none';
+		document.getElementById('show-custom-wordlist-btn').style.display = 'none';
+
+		startTime = new Date();
+		timerInterval = setInterval(updateTimer, 1000);
+		attempts = 0;
+		correctMatches = 0;
+
+		let availableWords = getAvailableWords(selectedRange);
+
+		if (availableWords.length < 6) {
+			usedWords.clear();
+			availableWords = getAvailableWords(selectedRange);
+		}
+		
+		currentPairs = shuffleArray(availableWords).slice(0, 6);
+		currentPairs.forEach(word => usedWords.add(word.english));
+		
+		renderBoard();
+	}
+
+    function updateTimer() {
+        const now = new Date();
+        const diff = now - startTime;
+        const minutes = Math.floor(diff / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
+        document.getElementById('time').textContent = 
+            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function colorizeEnglishWord(word) {
+        const vowels = ['a', 'e', 'i', 'o', 'u'];
+        const semivowels = ['w', 'y'];
+        return word.split('').map(char => {
+            if (vowels.includes(char.toLowerCase())) {
+                return `<span class="vowel">${char}</span>`;
+            } else if (semivowels.includes(char.toLowerCase())) {
+                return `<span class="semivowel">${char}</span>`;
+            } else {
+                return `<span class="consonant">${char}</span>`;
+            }
+        }).join('');
+    }
+
+
+function colorizeKKPhonetic(kk) {
+    const vowels = ['ɑ', 'æ', 'ɛ', 'e', 'ɪ', 'i', 'ɔ', 'o', 'ʊ', 'u', 'ʌ', 'ə', 'ɚ', 'ɝ'];
+    const semivowels = ['j', 'w'];
+    const specialChars = ['[', ']', ',', "'", ' '];
+
+    return kk.split('').map(char => {
+        if (vowels.includes(char)) {
+            return `<span class="vowel">${char}</span>`;
+        } else if (semivowels.includes(char)) {
+            return `<span class="semivowel">${char}</span>`;
+        } else if (!specialChars.includes(char)) {
+            return `<span class="consonant">${char}</span>`;
+        }
+        return char;
+    }).join('');
+}
+
+    function renderBoard() {
+        const gameBoard = document.getElementById('game-board');
+        gameBoard.innerHTML = '';
+        
+        const allCards = [...currentPairs.map(word => ({ word, type: selectedPair[0] })), 
+                          ...currentPairs.map(word => ({ word, type: selectedPair[1] }))];
+        const shuffledCards = shuffleArray(allCards);
+        
+        shuffledCards.forEach((card, index) => {
+            const cardElement = document.createElement('div');
+            cardElement.className = 'card';
+            if (card.type === 'english') {
+                cardElement.innerHTML = colorizeEnglishWord(card.word[card.type]);
+            } else if (card.type === 'kk' && selectedPair.includes('kk') && selectedPair.includes('chinese')) {
+                cardElement.innerHTML = colorizeKKPhonetic(card.word[card.type]);
+            } else {
+                cardElement.textContent = card.word[card.type];
+            }
+            cardElement.dataset.index = index;
+            cardElement.onclick = () => flipCard(cardElement, card);
+            gameBoard.appendChild(cardElement);
+        });
+    }
+
+    function flipCard(cardElement, card) {
+        if (flippedCards.length < 2 && !flippedCards.some(fc => fc.element === cardElement) && !cardElement.classList.contains('matched')) {
+            cardElement.classList.add('flipped');
+            flippedCards.push({ element: cardElement, card: card });
+            
+            if (card.type === 'english') {
+                speakWord(card.word.english);
+            }
+            
+            if (flippedCards.length === 2) {
+                setTimeout(checkMatch, 10);
+            }
+        }
+    }
+
+
+    function checkMatch() {
+        const [card1, card2] = flippedCards;
+        attempts++;
+        if (card1.card.word === card2.card.word && card1.card.type !== card2.card.type) {
+            card1.element.classList.add('matched', 'jump');
+            card2.element.classList.add('matched', 'jump');
+            speakWord(card1.card.word.english);
+            rightSound.play();
+            correctMatches++;
+
+            // 移除跳動動畫類別
+            setTimeout(() => {
+                card1.element.classList.remove('jump');
+                card2.element.classList.remove('jump');
+            }, 300);
+        } else {
+            card1.element.classList.add('shake');
+            card2.element.classList.add('shake');
+            wrongSound.play();
+
+            // 移除晃動動畫類別並翻回卡片
+            setTimeout(() => {
+                card1.element.classList.remove('shake', 'flipped');
+                card2.element.classList.remove('shake', 'flipped');
+            }, 300);
+        }
+        flippedCards = [];
+
+        if (document.querySelectorAll('.card:not(.matched)').length === 0) {
+            clearInterval(timerInterval);
+            showStats();
+            setTimeout(showGameControls, 10);
+        }
+    }
+
+
+    function showStats() {
+        const accuracy = Math.round((correctMatches / attempts) * 100);
+        document.getElementById('accuracy').textContent = `${accuracy}%`;
+        document.getElementById('stats').style.display = 'block';
+    }
+
+    function showGameControls() {
+        document.getElementById('game-controls').style.display = 'block';
+    }
+
+    function speakWord(word) {
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = 'en-US';
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function continueGame() {
+        document.getElementById('game-controls').style.display = 'none';
+        startGame();
+    }
+
+    function returnToSetup() {
+        document.getElementById('game-board').style.display = 'none';
+        document.getElementById('game-controls').style.display = 'none';
+        document.getElementById('setup').style.display = 'block';
+        document.getElementById('return-button').style.display = 'none';
+        document.getElementById('stats').style.display = 'none';
+		document.getElementById('show-custom-wordlist-btn').style.display = 'inline-block';
+        clearInterval(timerInterval);
+    }
+
+    // 初始化
+    parseData();
+    populateDateDropdown();
+    </script>
+</body>
+</html>
