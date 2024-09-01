@@ -87,6 +87,13 @@
         .vowel { color: #AA0000; }
         .semivowel { color: #4B0082; }
         .consonant { color: #0000AA; }
+		.kk-bracket {
+		    color: #555 !important;
+		}
+		#word-list-table .clickable .kk-bracket {
+			color: #555 !important;
+		}
+
         #return-button {
             position: absolute;
             top: 5px;
@@ -184,27 +191,35 @@
             text-decoration: none;
             cursor: pointer;
         }
-        
-        #word-list-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        #word-list-table th, #word-list-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        
-        #word-list-table th {
-            background-color: #f2f2f2;
-        }
-        
-        .clickable {
-            cursor: pointer;
-            color: #0000FF;
-            text-decoration: none;
-        }
+
+		#word-list-table {
+			width: 100%;
+			border-collapse: collapse;
+		}
+
+		#word-list-table th, #word-list-table td {
+			border: 1px solid #ddd;
+			padding: 8px;
+			text-align: left;
+		}
+
+		#word-list-table th {
+			background-color: #f2f2f2;
+		}
+
+		/* 新增：實現隔欄淺灰底 */
+		#word-list-table tr:nth-child(even) {
+			background-color: #f9f9f9;
+		}
+
+
+		/* 確保點擊區域的樣式正確 */
+		#word-list-table .clickable {
+			cursor: pointer;
+			color: #0000FF;
+			text-decoration: none;
+		}
+
 
     </style>
 </head>
@@ -302,34 +317,6 @@
 9	slice	[slaɪs]	把...切成薄片	v
 10	on sale	[ɑn][sel]	特價；拍賣	idiom
 10	pie	[paɪ]	派；餡餅	n
-10	bake	[bek]	烘烤	v
-10	else	[els]	其他，別的	adj
-10	simple	['sɪmpəl]	簡單的	adj
-11	farmer	['fɑrmər]	農夫	n
-11	grow	[gro]	生長	v
-11	notice	['notɪs]	注意到	v
-11	wish	[wɪʃ]	想要；希望	v
-11	reward	[rɪ'wɔrd]	獎賞	n
-12	double	['dʌbəl]	加一倍	v
-12	shall	[ʃæl]	表某事肯定或必須會發生	aux. v
-12	clever	['klevər]	聰明的	adj
-12	deliver	[dɪ'lɪvər]	運送	v
-12	final	['faɪnəl]	最後的	adj
-13	hang up	[hæŋ][ʌp]	掛斷(電話)	phr v
-13	hang out	[hæŋ][aʊt]	與...在一起消磨時間	phr v
-13	hang on to	[hæŋ][ɑn][tu]	保住；抓緊	idiom
-13	hang it up	[hæŋ][ɪt][ʌp]	放棄；退出	idiom
-13	hang in there	[hæŋ][ɪn][ðer]	堅持住	idiom
-16	smooth	[smuð]	平滑的	adj
-16	paint	[pent]	顏料；塗料	n
-16	brush	[brʌʃ]	畫筆；刷子	n
-16	photo	['foto]	照片	n
-16	between	[bɪ'twin]	在...之間	prep
-17	race	[res]	(使)參加比賽；賽跑	v
-17	engine	['endʒɪn]	引擎	n
-17	fast	[fæst]	快速地	adv
-17	kilometer	[kɪ'lɑmɪtər]	公里	n
-17	driver	['draɪvər]	駕駛；司機	n
 `;
 
 
@@ -550,22 +537,24 @@ window.onload = parseData;
     }
 
 
-function colorizeKKPhonetic(kk) {
-    const vowels = ['a', 'ɑ', 'æ', 'ɛ', 'e', 'ɪ', 'i', 'ɔ', 'o', 'ʊ', 'u', 'ʌ', 'ə', 'ɚ', 'ɝ'];
-    const semivowels = ['j', 'w'];
-    const specialChars = ['[', ']', ',', "'", ' '];
+	function colorizeKKPhonetic(kk) {
+		const vowels = ['a', 'ɑ', 'æ', 'ɛ', 'e', 'ɪ', 'i', 'ɔ', 'o', 'ʊ', 'u', 'ʌ', 'ə', 'ɚ', 'ɝ'];
+		const semivowels = ['j', 'w'];
+		const specialChars = [',', "'", ' '];
 
-    return kk.split('').map(char => {
-        if (vowels.includes(char)) {
-            return `<span class="vowel">${char}</span>`;
-        } else if (semivowels.includes(char)) {
-            return `<span class="semivowel">${char}</span>`;
-        } else if (!specialChars.includes(char)) {
-            return `<span class="consonant">${char}</span>`;
-        }
-        return char;
-    }).join('');
-}
+		return kk.split('').map(char => {
+			if (vowels.includes(char)) {
+				return `<span class="vowel">${char}</span>`;
+			} else if (semivowels.includes(char)) {
+				return `<span class="semivowel">${char}</span>`;
+			} else if (char === '[' || char === ']') {
+				return `<span class="kk-bracket">${char}</span>`;
+			} else if (!specialChars.includes(char)) {
+				return `<span class="consonant">${char}</span>`;
+			}
+			return char;
+		}).join('');
+	}
 
     function renderBoard() {
         const gameBoard = document.getElementById('game-board');
@@ -678,11 +667,10 @@ function colorizeKKPhonetic(kk) {
 	}
 
 
-
 	function showWordList() {
 		const modal = document.getElementById('word-list-modal');
 		const tableBody = document.querySelector('#word-list-table tbody');
-		tableBody.innerHTML = ''; // 清空現有內容
+		tableBody.innerHTML = '';
 
 		let wordsToShow = selectedRange === 'all' ? words : getAvailableWords(selectedRange);
 
