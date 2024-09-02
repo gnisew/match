@@ -29,8 +29,8 @@
 				grid-template-columns: repeat(2, 1fr);
 			}
 			.card {
-			   padding: 15px !important;
-			   font-size: 16px !important;
+			   padding: 15px 10px!important;
+			   font-size: 20px !important;
 			}
 		}
         .card:hover {
@@ -78,7 +78,7 @@
 		}
 
 		.pair-button.selected {
-			background-color: #4a90e2;  /* 選中時的顏色 */
+			background-color: #4a90e2;
 			color: white;
 			border-color: #3a80d2;
 			box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -129,109 +129,16 @@
             animation: shakeAnimation 0.3s ease;
         }
 
-#custom-wordlist-container {
-    position: fixed; 
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.15);
-    z-index: 1000;
-    max-height: 90vh;
-    width: 90%;
-    max-width: 500px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.custom-wordlist-scroll {
-    flex-grow: 1;
-    overflow-y: auto;
-    margin-top: 20px;
-    padding-right: 10px;
-    max-height: calc(90vh - 300px); 
-}
-
-#custom-wordlist {
-    width: 95%;
-    resize: vertical;
-    min-height: 100px;
-    max-height: 200px;
-    overflow-y: auto;
-    border: 0.5px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    font-size: 14px;
-}
-
-#custom-wordlist {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-}
-
-#custom-wordlist {
-    transform: translateZ(0);
-}
-
-.button-group {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 15px;
-}
-
-.button-group button {
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: #4a90e2;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.button-group button:hover {
-    background-color: #3a80d2;
-}
-
-.wordlist-item {
-    background-color: #f5f5f5;
-    border-radius: 5px;
-    padding: 0px 10px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.wordlist-name {
-    font-weight: bold;
-}
-
-.wordlist-actions button {
-    padding: 5px 10px;
-    margin-left: 5px;
-    border: none;
-    border-radius: 3px;
-    background-color: #e0e0e0;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.wordlist-actions button:hover {
-    background-color: #d0d0d0;
-}
-
-h2 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #333;
-}
-		#saved-wordlists {
-			margin-top: 20px;
+		#custom-wordlist-container {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			background-color: white;
+			padding: 20px;
+			border: 1px solid #ccc;
+			box-shadow: 0 0 10px rgba(0,0,0,0.1);
+			z-index: 1000;
 		}
 
 		#custom-wordlist-btn-container {
@@ -313,18 +220,7 @@ h2 {
 			text-decoration: none;
 		}
 
-		#saved-wordlists {
-			margin-top: 20px;
-		}
-		.wordlist-item {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			margin-bottom: 10px;
-		}
-		.wordlist-name {
-			cursor: pointer;
-		}
+
     </style>
 </head>
 <body>
@@ -338,17 +234,12 @@ h2 {
 
 		<div id="custom-wordlist-container" style="display: none;">
 			<h2>輸入自訂語詞表</h2>
-			<textarea id="custom-wordlist" placeholder="請輸入自訂語詞表，格式為：英文\t中文\n每行一個單詞對"></textarea>
-			<div class="button-group">
-				<button onclick="clearCustomWordlist()">清除</button>
-				<button onclick="saveCustomWordlist()">儲存</button>
-				<button onclick="closeCustomWordlist()">關閉</button>
-				<button onclick="confirmCustomWordlist()">確認</button>
-			</div>
-			<div class="custom-wordlist-scroll">
-				<div id="saved-wordlists"></div>
-			</div>
-		</div>
+			<textarea id="custom-wordlist" rows="10" cols="50" placeholder="請輸入自訂語詞表，格式為：英文\t中文\n每行一個單詞對"></textarea>
+			<br>
+			<button onclick="clearCustomWordlist()">清除</button>
+			<button onclick="closeCustomWordlist()">關閉</button>
+			<button onclick="saveCustomWordlist()">確認</button>
+		</div>		
 
         <div id="setup">
 			<div id="custom-wordlist-btn-container">
@@ -392,7 +283,6 @@ h2 {
     </div>
 
     <script>
-    const localStorage = "enc";
     const data = `
 日期	英文	中文釋義	KK音標	詞性
 2	quiet	安靜的	['kwaɪt]	adj
@@ -478,137 +368,27 @@ h2 {
 let customData = '';
 
 function showCustomWordlist() {
-    const container = document.getElementById('custom-wordlist-container');
-    container.style.display = 'flex';
-    renderSavedWordlists();
-    
-    // 
-    setTimeout(() => {
-        const rect = container.getBoundingClientRect();
-        if (rect.height > window.innerHeight) {
-            container.style.top = '5vh';
-            container.style.transform = 'translateX(-50%)';
-            container.style.height = '90vh';
-        }
-    }, 0);
+    document.getElementById('custom-wordlist-container').style.display = 'block';
+    document.getElementById('show-custom-wordlist-btn').style.display = 'none';
 }
 
 function closeCustomWordlist() {
     document.getElementById('custom-wordlist-container').style.display = 'none';
+    document.getElementById('show-custom-wordlist-btn').style.display = 'inline-block';
+}
+
+function saveCustomWordlist() {
+    customData = document.getElementById('custom-wordlist').value;
+    closeCustomWordlist();
+    parseData();  // 重新解析數據
 }
 
 function clearCustomWordlist() {
     document.getElementById('custom-wordlist').value = '';
+    customData = '';
+    parseData();  // 重新解析數據
 }
 
-
-function safelyGetFromStorage(key) {
-    try {
-        if (window.localStorage && typeof window.localStorage.getItem === 'function') {
-            return window.localStorage.getItem(key);
-        }
-    } catch (e) {
-        console.error('Error accessing localStorage:', e);
-    }
-    return null;
-}
-
-function safelySetToStorage(key, value) {
-    try {
-        if (window.localStorage && typeof window.localStorage.setItem === 'function') {
-            window.localStorage.setItem(key, value);
-        }
-    } catch (e) {
-        console.error('Error setting localStorage:', e);
-    }
-}
-
-function saveCustomWordlist() {
-    const wordlist = document.getElementById('custom-wordlist').value;
-    if (wordlist.trim() === '') {
-        alert('請輸入語詞表內容');
-        return;
-    }
-    
-    const now = new Date();
-    const timestamp = now.getTime();
-    const formattedDate = `${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    const wordlistName = `語詞表 ${formattedDate}`;
-    
-    let wordlists = [];
-    const storedData = safelyGetFromStorage('wordlists');
-    if (storedData) {
-        wordlists = JSON.parse(storedData);
-    }
-    wordlists.unshift({ name: wordlistName, content: wordlist, timestamp: timestamp });
-    safelySetToStorage('wordlists', JSON.stringify(wordlists));
-    renderSavedWordlists();
-}
-
-function confirmCustomWordlist() {
-    customData = document.getElementById('custom-wordlist').value;
-    closeCustomWordlist();
-    parseData();
-}
-
-
-function renderSavedWordlists() {
-    const container = document.getElementById('saved-wordlists');
-    let wordlists = [];
-    const storedData = safelyGetFromStorage('wordlists');
-    if (storedData) {
-        wordlists = JSON.parse(storedData);
-    }
-    container.innerHTML = '';
-    wordlists.forEach((wordlist, index) => {
-        const item = document.createElement('div');
-        item.className = 'wordlist-item';
-        item.innerHTML = `
-            <span class="wordlist-name" ondblclick="renameWordlist(${index})">${wordlist.name}</span>
-            <div class="wordlist-actions">
-                <button onclick="restoreWordlist(${index})">還原</button>
-                <button onclick="deleteWordlist(${index})">刪除</button>
-            </div>
-        `;
-        container.appendChild(item);
-    });
-}
-
-
-function restoreWordlist(index) {
-    const storedData = safelyGetFromStorage('wordlists');
-    if (storedData) {
-        const wordlists = JSON.parse(storedData);
-        if (wordlists[index]) {
-            document.getElementById('custom-wordlist').value = wordlists[index].content;
-        }
-    }
-}
-
-// 修改 deleteWordlist 函數
-function deleteWordlist(index) {
-    const storedData = safelyGetFromStorage('wordlists');
-    if (storedData) {
-        const wordlists = JSON.parse(storedData);
-        wordlists.splice(index, 1);
-        safelySetToStorage('wordlists', JSON.stringify(wordlists));
-        renderSavedWordlists();
-    }
-}
-
-// 修改 renameWordlist 函數
-function renameWordlist(index) {
-    const storedData = safelyGetFromStorage('wordlists');
-    if (storedData) {
-        const wordlists = JSON.parse(storedData);
-        const newName = prompt('請輸入新的語詞表名稱', wordlists[index].name);
-        if (newName && newName.trim() !== '') {
-            wordlists[index].name = newName.trim();
-            safelySetToStorage('wordlists', JSON.stringify(wordlists));
-            renderSavedWordlists();
-        }
-    }
-}
 
 // 修改parseData函數以處理自訂數據
 function parseData() {
@@ -678,7 +458,7 @@ function parseData() {
             rangeSelect.appendChild(option);
         });
     } else {
-        // 如果沒有日期、分類，生成每10個單詞一組的選項
+        // 如果沒有日期，生成每10個單詞一組的選項
         const groups = Math.ceil(words.length / 10);
         for (let i = 0; i < groups; i++) {
             const option = document.createElement('option');
@@ -890,29 +670,11 @@ window.onload = parseData;
         document.getElementById('game-controls').style.display = 'block';
     }
 
-	let currentUtterance = null;
-
-	function speakWord(word) {
-		// 如果有正在播放的語音，先停止它;
-		if (currentUtterance) {
-			window.speechSynthesis.cancel();
-		}
-
-		// 創建新的語音
-		const utterance = new SpeechSynthesisUtterance(word);
-		utterance.lang = 'en-US';
-
-		// 保存當前語音引用
-		currentUtterance = utterance;
-
-		// 播放新語音
-		window.speechSynthesis.speak(utterance);
-
-		// 語音結束後清除引用
-		utterance.onend = () => {
-			currentUtterance = null;
-		};
-	}
+    function speakWord(word) {
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = 'en-US';
+        window.speechSynthesis.speak(utterance);
+    }
 
     function continueGame() {
         document.getElementById('game-controls').style.display = 'none';
@@ -927,7 +689,9 @@ window.onload = parseData;
 		document.getElementById('stats').style.display = 'none';
 		document.getElementById('show-custom-wordlist-btn').style.display = 'inline-block';
 		clearInterval(timerInterval);
-		usedWords.clear();
+		usedWords.clear(); // 清除已使用的單詞集合
+		selectedRange = 'all'; // 重置選擇的範圍
+		document.getElementById('range-select').value = 'all'; // 重置下拉選單
 	}
 
 function showWordList() {
@@ -1003,12 +767,11 @@ function updateSelectedRange() {
     }
 }
 
+
+
     // 初始化
-	parseData();
-	populateDateDropdown();
-	document.getElementById('show-custom-wordlist-btn').onclick = showCustomWordlist;
-
-
+    parseData();
+    populateDateDropdown();
     </script>
 </body>
 </html>
