@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🥷烏衣行英語配對遊戲</title>
+    <title>🥷烏衣行英語遊戲</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -53,6 +53,7 @@
             cursor: pointer;
             transition: background-color 0.3s;
 			font-size: 24px;
+			user-select: none;
         }
         .card.flipped {
             background-color: #ffff99;
@@ -167,6 +168,11 @@
     font-size: 14px;
 }
 
+.correctAnswerElement{
+    user-select: none;
+    font-size: 36px;
+}
+
 #custom-wordlist {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -225,10 +231,15 @@
     background-color: #d0d0d0;
 }
 
+h1 {
+	user-select: none;
+}
+
 h2 {
     margin-top: 0;
     margin-bottom: 15px;
     color: #333;
+	user-select: none;
 }
 		#saved-wordlists {
 			margin-top: 20px;
@@ -323,6 +334,66 @@ h2 {
 		.wordlist-name {
 			cursor: pointer;
 		}
+
+		#game-board {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			height: 100%;
+		}
+
+		#game-board {
+			margin-bottom: 20px;
+			text-align: center;
+			word-break: break-all;
+		}
+
+		.word-display {
+			font-size: 36px;
+			margin-bottom: 20px;
+			text-align: center;
+			word-break: break-all;
+		}
+		#game-board input {
+			font-size: 36px;
+			padding: 10px 15px;
+			border: 2px solid #ccc;
+			border-radius: 5px;
+			text-align: center;
+			width: 300px;
+			max-width: 80%;
+			outline: none;
+			transition: border-color 0.3s;
+		}
+
+		#game-board input:focus {
+			border-color: #4a90e2;
+		}
+
+
+
+input::placeholder {
+    color: #CCCCCC;
+    opacity: 1;
+}
+
+input::-webkit-input-placeholder { 
+    color: #CCCCCC;
+}
+input::-moz-placeholder { 
+    color: #CCCCCC;
+}
+input:-ms-input-placeholder {
+    color: #CCCCCC;
+}
+input:-moz-placeholder {
+    color: #CCCCCC;
+}
+
+
+
+
     </style>
 </head>
 <body>
@@ -332,7 +403,7 @@ h2 {
             時間：<span id="time">00:00</span><br>
             正確率：<span id="accuracy">100%</span>
         </div>
-        <h1>🥷烏衣行英語配對遊戲</h1>
+        <h1>🥷烏衣行英語遊戲</h1>
 
 		<div id="custom-wordlist-container" style="display: none;">
 			<span class="close" onclick="closeCustomWordlist()">&times;</span>
@@ -359,7 +430,8 @@ h2 {
             <select id="range-select" onchange="updateSelectedRange()">
                 <option value="all">全部</option>
             </select>
-            <button onclick="startGame()">開始遊戲</button>
+            <button onclick="startGame()">開始配對</button>
+			<button onclick="startSpellingGame()">開始拼字</button>
 			<button id="view-words-btn" onclick="showWordList()">檢視語詞</button>
         </div>
         <div id="game-board" style="display: none;"></div>
@@ -771,31 +843,175 @@ window.onload = parseData;
         selectedRange = document.getElementById('range-select').value;
     }
 
-	function startGame() {
-		document.getElementById('setup').style.display = 'none';
-		document.getElementById('game-board').style.display = 'grid';
-		document.getElementById('game-controls').style.display = 'none';
-		document.getElementById('return-button').style.display = 'block';
-		document.getElementById('stats').style.display = 'none';
-		document.getElementById('show-custom-wordlist-btn').style.display = 'none';
+function startGame() {
+    document.getElementById('setup').style.display = 'none';
+    document.getElementById('game-board').style.display = 'grid';
+    document.getElementById('game-controls').style.display = 'none';
+    document.getElementById('return-button').style.display = 'block';
+    document.getElementById('stats').style.display = 'none';
+    document.getElementById('show-custom-wordlist-btn').style.display = 'none';
 
-		startTime = new Date();
-		timerInterval = setInterval(updateTimer, 1000);
-		attempts = 0;
-		correctMatches = 0;
+    startTime = new Date();
+    timerInterval = setInterval(updateTimer, 1000);
+    attempts = 0;
+    correctMatches = 0;
 
-		let availableWords = getAvailableWords(selectedRange);
+    let availableWords = getAvailableWords(selectedRange);
 
-		if (availableWords.length < 6) {
-			usedWords.clear();
-			availableWords = getAvailableWords(selectedRange);
-		}
-		
-		currentPairs = shuffleArray(availableWords).slice(0, 6);
-		currentPairs.forEach(word => usedWords.add(word.english));
-		
-		renderBoard();
-	}
+    if (availableWords.length < 6) {
+        usedWords.clear();
+        availableWords = getAvailableWords(selectedRange);
+    }
+    
+    currentPairs = shuffleArray(availableWords).slice(0, 6);
+    currentPairs.forEach(word => usedWords.add(word.english));
+    
+    renderBoard();
+}
+
+let spellingRound = 1;
+let spellingWords = [];
+
+function startSpellingGame() {
+	usedWords.clear();
+    document.getElementById('setup').style.display = 'none';
+    document.getElementById('game-board').style.display = 'flex';
+    document.getElementById('game-controls').style.display = 'none';
+    document.getElementById('return-button').style.display = 'block';
+    document.getElementById('stats').style.display = 'none';
+    document.getElementById('show-custom-wordlist-btn').style.display = 'none';
+
+    startTime = new Date();
+    timerInterval = setInterval(updateTimer, 1000);
+    attempts = 0;
+    correctMatches = 0;
+
+    spellingRound = 1;
+    spellingWords = shuffleArray(getAvailableWords(selectedRange)).slice(0, 5);
+    spellingWords.forEach(word => usedWords.add(word.english));
+
+    renderSpellingGame();
+}
+
+function renderSpellingGame() {
+    const gameBoard = document.getElementById('game-board');
+    gameBoard.innerHTML = '';
+
+    if (spellingRound <= 5) {
+        const currentSpellingWord = spellingWords[spellingRound - 1];
+        const wordDisplay = document.createElement('div');
+        wordDisplay.className = 'word-display';
+        wordDisplay.innerHTML = selectedPair[1] === 'chinese' ? currentSpellingWord.chinese : colorizeKKPhonetic(currentSpellingWord.kk);
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        
+        // 創建佔位符文字
+        const answerWord = currentSpellingWord.english;
+        const placeholderText = answerWord.split('').map((char, index) => {
+            if (index === 0) return char;
+            if (char === ' ') return ' ';
+            if (char === '-') return '-';
+            return '*';
+        }).join('');
+
+        input.placeholder = placeholderText;
+
+        input.addEventListener('keyup', (e) => checkSpellingAnswer(e, currentSpellingWord));
+        input.onfocus = () => input.select();
+
+        gameBoard.appendChild(wordDisplay);
+        gameBoard.appendChild(input);
+        input.focus();
+
+        spellingRound++;
+    } else {
+        showSpellingResults();
+    }
+}
+
+function showSpellingResults() {
+    const now = new Date();
+    const diff = now - startTime;
+    const seconds = Math.floor((diff % 60000) / 1000);
+    const accuracy = Math.round((correctMatches / attempts) * 100);
+
+    const statsDiv = document.createElement('div');
+    statsDiv.className = 'stats-display';
+    statsDiv.innerHTML = `
+        <h2>回合結束</h2>
+        <p>用時: ${seconds}秒</p>
+        <p>正確率: ${accuracy}%</p>
+    `;
+
+    const continueButton = document.createElement('button');
+    continueButton.textContent = '繼續';
+    continueButton.onclick = startSpellingGame;
+
+    const returnButton = document.createElement('button');
+    returnButton.textContent = '返回';
+    returnButton.onclick = returnToSetup;
+
+    const gameBoard = document.getElementById('game-board');
+    gameBoard.innerHTML = '';
+    gameBoard.appendChild(statsDiv);
+    gameBoard.appendChild(continueButton);
+    gameBoard.appendChild(returnButton);
+
+    clearInterval(timerInterval);
+}
+
+function checkSpellingAnswer(e, word) {
+    if (e.key === 'Enter') {
+        const userInput = e.target.value.toLowerCase().trim();
+        const correctWord = word.english.toLowerCase().trim();
+
+		if (userInput === correctWord) {
+			
+            rightSound.play();
+            correctMatches++;
+            attempts++;         
+            setTimeout(() => {
+			   e.target.value = '';
+			   
+               renderSpellingGame();
+               e.target.focus();
+            }, 10);
+        } else {
+            wrongSound.play();
+            attempts++;
+			speakWord(word.english);
+			e.target.classList.add('shake');
+
+            // 在輸入框下方顯示正確答案
+            const inputContainer = e.target.parentElement;
+            const correctAnswerElement = document.createElement('div');
+            //correctAnswerElement.textContent = `✨ ${word.english}`;
+			correctAnswerElement.innerHTML = `✨ ${colorizeEnglishWord(word.english)} ✨`;
+			
+			correctAnswerElement.className = 'correctAnswerElement';
+            inputContainer.appendChild(correctAnswerElement);
+			
+
+            // 清除正確答案提示並讓使用者重新輸入
+            setTimeout(() => {
+                correctAnswerElement.remove();
+                e.target.value = '';
+                e.target.focus();
+            }, 2000);
+        }
+    }
+}
+
+
+
+
+
+function updateStats() {
+    const accuracy = Math.round((correctMatches / attempts) * 100);
+    document.getElementById('accuracy').textContent = `${accuracy}%`;
+}
+
 
     function updateTimer() {
         const now = new Date();
