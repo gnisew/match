@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🥷烏衣行成語</title>
+	<link rel="stylesheet" href="https://oikasu1.github.io/fonts/twfonts.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+			user-select: none;
+        }
+        .container {
+            background-color: white;
+	  	    justify-content: center;
+		    align-items: center;
+            padding: 30px 20px 20px 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        }
+        .setup, .game {
+            display: none;
+        }
+        .active {
+            display: block;
+        }
+        select, button {
+            margin: 10px;
+            padding: 5px 10px;
+        }
+        .item-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .left-item, .right-item {
+            margin: 5px;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+			transition: all 0.3s ease;
+			border: 2px solid #fff;			
+        }
+
+        .left-item:hover, .right-item:hover {
+            background-color: #d5d5d5;
+        }
+
+        .left-item {
+			background-color: #ebebeb;
+			font-family: BpmfZihiSans-Regular;	
+			font-size: 1.2em;
+        }
+
+        .right-item {
+			background-color: #e8e8e8;
+        }
+
+        .selected {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .selected:hover {
+            background-color: #299920;
+            color: white;
+        }
+
+		.left-item.correct, .right-item.correct {
+			background-color: #fff !important;
+			color: #1B5E20;
+			border: 2px solid #AACC88;
+		}
+
+        #start-button, #view-idioms-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+		#next-button-container {
+			display: flex;
+			justify-content: space-between;
+			margin-top: 10px;
+		}
+		#next-button, #end-button {
+			width: calc(50% - 5px);
+			height: 40px;
+			padding: 10px;
+			background-color: #4CAF50;
+			color: white;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+			visibility: hidden;
+			opacity: 0;
+			transition: opacity 0.3s ease;
+		}
+
+		#next-button.visible, #end-button.visible {
+			visibility: visible;
+			opacity: 1;
+		}
+
+
+
+		#return-to-setup {
+			display: block;
+			margin-top: 20px;
+			padding: 10px 20px;
+			background-color: #4CAF50;
+			color: white;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+        .progress-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .close-button {
+            margin-right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .progress-bar {
+            flex-grow: 1;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .round-info {
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        #character {
+            transition: transform 0.3s ease;
+        }
+        #character.animated {
+            transform: scale(1.5);
+        }
+
+		.result {
+			display: none;
+	  	    justify-content: center;
+		    align-items: center;
+			margin: 20px auto;
+			max-width: 400px;
+			padding: 20px;
+			border-radius: 10px;
+
+		}
+
+		.result h2 {
+			text-align: center;
+			margin-bottom: 20px;
+			color: #333;
+		}
+
+		.result p {
+			margin: 10px 0;
+			font-size: 16px;
+			color: #555;
+		}
+
+		.accuracy-container {
+		 text-align: center;
+		}
+
+		.accuracy-bar {
+			flex-grow: 1;
+			height: 20px;
+			background-color: #e0e0e0;
+			border-radius: 10px;
+			margin-left: 10px;
+			overflow: hidden;
+		}
+
+		#accuracy-progress {
+			height: 100%;
+			background-color: #4CAF50;
+			width: 0%;
+			transition: width 0.5s ease-in-out;
+		}
+
+		#return-to-setup {
+			display: block;
+			width: 100%;
+			margin-top: 20px;
+			padding: 10px;
+			background-color: #4CAF50;
+			color: white;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+			font-size: 16px;
+			transition: background-color 0.3s;
+		}
+
+		#return-to-setup:hover {
+			background-color: #45a049;
+		}
+
+		@media (max-width: 768px) {
+			.item-container {
+				flex-direction: column;
+				align-items: stretch;
+			}
+
+			#leftContainer {
+				flex-direction: row;
+				flex-wrap: wrap;
+				justify-content: space-between;
+			}
+
+			#leftContainer .left-item {
+				width: calc(50% - 10px);
+				box-sizing: border-box;\				
+			}
+
+			#rightContainer .right-item {
+				width: calc(100% - 30px);
+				margin-bottom: 10px;
+			}
+
+			#next-button-container {
+				flex-direction: row;
+			}
+
+			#next-button, #end-button {
+				width: calc(50% - 5px);
+			}
+
+
+		}
+
+		.sound-button {
+			margin-right: 10px;
+			cursor: pointer;
+			font-size: 20px;
+		}
+
+.idiom-list {
+    background-color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    width: calc(100% - 40px);
+    margin: 0 auto;
+	height: 70vh;
+    position: relative;
+}
+
+.idiom-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.idiom-header h2 {
+    margin: 0;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.idiom-header .close-button {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 0;
+}
+
+/* 確保其他關閉按鈕不受影響 */
+.close-button:not(#close-idiom-list) {
+    position: static;
+    transform: none;
+}
+
+
+
+
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #333;
+}
+
+.idiom-controls {
+    margin-bottom: 10px;
+}
+
+.idiom-controls label {
+    margin-right: 10px;
+}
+
+
+
+
+.idiom-table-container {
+    overflow-x: auto;
+    max-height: calc(80vh - 130px);
+}
+
+#idiom-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#idiom-table thead {
+    position: sticky;
+    top: 0;
+	padding: 20px;
+    background-color: #f2f2f2;
+    z-index: 1;
+}
+
+#idiom-table th  {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+#idiom-table td {
+    border: 1px solid #ddd;
+    padding: 5px 5px 5px 10px;
+    text-align: left;
+}
+
+
+
+.small-number{
+    color: #ff5555;
+	font-size: 0.4em;
+}
+
+.idiom {
+    min-width: 120px;
+	font-size: 1.05em;
+	font-family: BpmfZihiSans-Regular;
+}
+
+
+
+
+#idiom-table th {
+    background-color: #e1e1e1;
+}
+
+#idiom-table tbody tr:nth-child(odd) {
+    background-color: #f8f8f8;
+}
+
+#idiom-table tbody tr:nth-child(even) {
+    background-color: #fefefe;
+}
+
+@media (max-width: 768px) {
+    .idiom-list {
+        padding: 10px;
+        max-height: 90vh;
+    }
+
+    .idiom-controls {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .idiom-controls label {
+        margin-bottom: 10px;
+    }
+
+    #idiom-table {
+        font-size: 14px;
+    }
+    
+    #idiom-table th, #idiom-table td {
+        padding: 5px;
+    }
+}
+
+.category-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0px;
+}
+
+.nav-button {
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.nav-button:hover {
+    background-color: #45a049;
+}
+
+.nav-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+		<div class="setup active" id="setup">
+			<h1 id="myTitle">🥷烏衣行成語</h1>
+			<div>
+				<label for="category-select">分類：</label>
+				<select id="category-select">
+					<option value="all">所有分類</option>
+					<!-- 其他分類選項將在這裡動態生成 -->
+				</select>
+			</div>
+			<div>
+				<label for="match-type-select">配對：</label>
+				<select id="match-type-select">
+					<option value="成語-表達意思">成語 - 表達意思</option>
+					<option value="成語-字面意思">成語 - 字面意思</option>
+					<option value="成語-例句">成語 - 例句</option>
+				</select>
+			</div>
+			<div>
+				<label for="order-select">順序：</label>
+				<select id="order-select">
+					<option value="random">隨機</option>
+					<option value="sequential">依序</option>
+				</select>
+			</div>			
+			<button id="view-idioms-button">檢視成語 🔎</button>
+			<button id="start-button">開始遊戲 🚀</button>
+		</div>
+        <div class="game" id="game">
+			<div class="progress-container">
+				<div class="close-button" id="close-button">X</div>				
+				<div class="progress-bar">
+					<div class="progress" id="progress"></div>
+				</div>
+				<div class="round-info" id="round-info"></div>
+				<div class="sound-button" id="sound-button">🔔</div>
+			</div>
+            <h1><span id="character">🙂</span>烏衣行成語配對</h1>
+            <div class="item-container" id="leftContainer"></div>
+            <div class="item-container" id="rightContainer"></div>
+            <div id="next-button-container">                
+				<button id="end-button">結束</button>
+				<button id="next-button">下一題</button>
+            </div>
+        </div>
+
+		<div class="idiom-list" id="idiom-list" style="display: none;">
+			<div class="category-navigation">
+				<button id="prev-category" class="nav-button">上一分類</button>
+				<button id="next-category" class="nav-button">下一分類</button>
+			</div>
+			<div class="idiom-header">
+				<h2>成語列表</h2>
+				<button id="close-idiom-list" class="close-button">X</button>
+			</div>
+
+			<div class="idiom-controls">
+				<label><input type="checkbox" id="show-category" checked>分類</label>
+				<label><input type="checkbox" id="show-idiom" checked>成語</label>
+				<label><input type="checkbox" id="show-literal" checked>字面</label>
+				<label><input type="checkbox" id="show-figurative" checked>用意</label>
+				<label><input type="checkbox" id="show-example">例句</label>
+			</div>
+			<div class="idiom-table-container">
+				<table id="idiom-table">
+					<thead>
+						<tr>
+							<th class="category">分類</th>
+							<th class="idiom">成語</th>
+							<th class="literal">字面意思</th>
+							<th class="figurative">表達意思</th>
+							<th class="example">例句</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- 成語資料將在這裡動態生成 -->
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div id="result" class="result">
+			<h2>🥷烏衣行成語</h2>
+		
+				<div class="accuracy-bar">
+					<div id="accuracy-progress"></div>
+				</div>
+
+			<div class="accuracy-container">		
+				<p id="accuracy"></p>
+				<p id="time-spent"></p>
+				<p id="total-rounds"></p>
+				<p id="total-pairs"></p>
+				<p id="selected-category"></p>
+				<p id="match-type-result"></p>
+				<p id="order-type-result"></p>
+			</div>
+			<button id="return-to-setup">返回</button>
+		</div>
+
+    </div>
+
+    <script>
+        const idiomsData = `
+分類	成語	字面意思	表達意思	例句
+智慧才能	仁心仁術	仁慈的心腸和仁愛的技術	形容既具同情心又有高超技術的人，特別指醫生	那位醫生不僅醫術精湛，還對病人特別關懷，真是仁心仁術的典範。|在災區，他們展現出仁心仁術，無私地救助每一位需要幫助的人。
+智慧才能	才高八斗	才能高達八斗之多	形容才學極為優秀	這位年輕作家才高八斗，作品備受讚譽。|這位作家才高八斗，作品廣受好評，文名遠揚。
+智慧才能	見微知著󠇡	看到微小就知道顯著的	從細微處見識到事物的本質	優秀的管理者能夠見微知著，防患於未然。|從一點小事中，他見微知著，預見了後續發展的趨勢。
+智慧才能	名副其實	名稱符合實際	名稱與實際相符合	這家餐廳的招牌菜名副其實，味道確實一流。|這家餐廳的美食確實名副其實，值得一試。
+智慧才能	水到渠成	水來了渠道就成形了	事情水到渠成，順利成功	只要努力，成功自然水到渠成。|經過長期的準備，項目最終順利完成，真是水到渠成。
+智慧才能	伯樂相馬	伯樂善於相馬	善於發現人才	這位星探善於伯樂相馬，發掘了許多演藝新秀。|在他的推薦下，那位新人得到了重用，真是伯樂相馬。
+智慧才能	雀屏中選	麻雀在屏風中被選中	在眾多競爭者中脫穎而出	在激烈的競爭中，他雀屏中選，成功晉級。|在眾多應聘者中，他憑藉出色的表現雀屏中選，獲得了這份工作。
+勤奮學習	孜孜不󠇡倦	勤勉不疲倦	勤奮不懈	科學家們孜孜不倦地研究，終於取得重大突破。|他孜孜不倦地追求真理，不斷探索新的知識領域。
+勤奮學習	手不󠇡釋卷	手不放下書卷	形容勤奮好學	她求學時期手不釋卷，最終考上了理想的大學。|他為了考試，日夜苦讀，手不釋卷，最終取得了好成績。
+勤奮學習	甘之如飴	甜如糖飴	把苦事當作甜事來做	他對繁重的工作甘之如飴，從不抱怨。|雖然工作艱辛，但他甘之如飴，樂在其中。
+勤奮學習	逆水行舟	逆著水流划船	比喻學習要不斷努力	創業維艱，如同逆水行舟，不進則退。|學習如同逆水行舟，不進則退，必須不斷努力。
+勤奮學習	囫圇吞棗	整顆吞下棗子	學習不求甚解	考試前急於複習的學生往往囫圇吞棗，效果不佳。|學習知識不能囫圇吞棗，應該細細品味，深入理解。
+堅毅精神	百折不撓	百次折彎也不屈服	屢遇挫折而不屈服	她面對挫折百折不撓，最終成功創業。|面對多次挫折，他依然百折不撓，最終取得了成功。
+堅毅精神	疾風勁草	強風中的勁草	比喻在逆境中堅強不屈的人	面對困境，他如疾風勁草，愈挫愈勇。|在疾風勁草的考驗下，真正的英雄才能脫穎而出。
+堅毅精神	破釜沉舟	打破鍋釜沉沒船隻	比喻下定決心，不留退路	軍隊破釜沉舟，展現必勝的決心。|他下定決心，破釜沉舟，一定要完成這個項目。
+人際關係	同舟共濟	同坐一條船共同渡河	比喻同心協力，共渡難關	在困難時期，全體員工同舟共濟，共度難關。|面對困難，大家必須同舟共濟，才能度過難關。
+人際關係	管鮑之交	管仲和鮑叔的交情	形容朋友之間非常要好	他們倆可謂管鮑之交，情誼深厚。|他們兩人的友誼深厚，堪稱現代的管鮑之交。
+人際關係	鶼鰈情深	鵝和鴛鴦的感情深厚	比喻夫妻恩愛	這對老夫妻鶼鰈情深，令人羨慕。|他們夫妻倆鶼鰈情深，讓人十分羨慕。
+人際關係	戶樞不󠇡蠹	門樞不會被蟲蛀	比喻經常做事的人不會生疏	老王從事教育工作多年，經驗豐富，可謂戶樞不蠹。|俗話說，戶樞不蠹，流水不腐，保持活動才能保持活力。
+教育與成長	因材施教	根據才能施行教育	根據不同的人因材施教	好老師都懂得因材施教，讓每個學生都能發揮所長。|老師根據學生的不同特點因材施教，取得了良好的教學效果。
+教育與成長	亡羊補牢	失去羊後修補羊圈	亡羊後補牢，亡羊後補牢，為時未晚	這次失誤後，公司立即採取措施，可謂亡羊補牢。|雖然錯過了最佳時機，但他還是趕緊亡羊補牢，避免更大的損失。
+教育與成長	繼往開來	繼承過去開創未來	繼承前人，開創未來	新一代領導人繼往開來，推動國家進步。|我們應繼往開來，將前人的精神發揚光大，迎接未來挑戰。
+言語表達	一󠇢言九鼎	一句話的分量如同九個鼎那麼重	形容說話極有分量	他的承諾如一言九鼎，大家都十分信賴。|他在公司中的地位極高，一言九鼎，決策具有極大的影響力。
+言語表達	言猶在耳	說的話還在耳邊	剛說過的話還在耳邊回響	父親的教誨言猶在耳，指引著我的人生方向。|老師的教誨言猶在耳，他始終銘記在心。
+言語表達	談笑風生	談笑中風趣橫生	談吐自如，說話有趣	酒過三巡，眾人談笑風生，其樂融融。|聚會上大家談笑風生，氣氛相當愉快。
+謹慎行事	箭在弦上	箭已經搭在弦上了	事情已到緊要關頭	計劃已經成熟，箭在弦上，不得不發。|事情已經發展到這種地步，簡直是箭在弦上，不得不發。
+謹慎行事	惜墨如金	珍惜墨如同黃金	珍惜文字如同珍惜黃金	古代紙墨昂貴，學子們惜墨如金。|這位書法家惜墨如金，每一筆都下得十分謹慎。
+謹慎行事	單刀直入	單把刀直接進入	直截了當地說明來意	他單刀直入地指出了問題的癥結。|他在會議中單刀直入，直接提出了問題的關鍵所在。
+負面行為	落井下石	向掉進井裡的人扔石頭	趁人處於困境落井下石	朋友遭遇困境，我們應該伸出援手，而不是落井下石。|他在朋友困難時不僅沒有幫助，反而落井下石，讓人心寒。
+負面行為	暗箭傷人	暗中射箭傷人	暗中傷害他人	職場中暗箭傷人的事時有發生，要多加小心。|他在背後散播流言，暗箭傷人，讓人無法防備。
+負面行為	狐假虎威	狐狸假借老虎的威風	仗勢欺人	仗著上司的權勢，他經常狐假虎威。|那個小主管狐假虎威，仗勢欺人，讓人十分反感。
+負面行為	好󠇡逸惡󠇡勞	喜歡安逸厭惡勞動	貪圖安逸，討厭勞動	他整天躺在沙發上看電視，真是好逸惡勞。|他好逸惡勞，不願努力工作，生活自然不會順利。
+負面行為	畫虎類狗	畫老虎卻畫得像狗	拙劣的模仿	他自詡為書法家，但作品實在是畫虎類狗。|他模仿名家作畫，但結果卻畫虎類狗，讓人失望。
+情感狀態	悵然若失	失落得好像丟了東西	形容失意或失望的樣子	畢業典禮後，同學們都感到悵然若失。|離開熟悉的環境，他感到悵然若失，心裡空落落的。
+情感狀態	涕泗滂沱	眼淚鼻涕如傾盆大雨	形容痛哭流涕的樣子	得知噩耗，她涕泗滂沱，久久不能平復。|聽到那悲慘的故事，她忍不住涕泗滂沱，淚流滿面。
+情感狀態	毛骨悚然	毛髮和骨頭都豎起來了	形容非常害怕的樣子	聽到深夜的詭異聲響，我感到毛骨悚然。|聽到那恐怖的故事，他不禁毛骨悚然，汗毛豎起。
+處境困難	四面楚歌	四面都是楚國的歌聲	比喻四面受敵，處境困難	公司陷入困境，面臨四面楚歌的局面。|公司內外問題重重，四面楚歌，陷入了困境。
+處境困難	江郎才盡	江郎的才華用盡了	才思枯竭	這位作家近年作品平平，似乎有江郎才盡之勢。|這位作家近期作品平平，似乎江郎才盡，難以超越過去的輝煌。
+處境困難	梧鼠技窮	梧桐樹上的老鼠技窮了	比喻才能已到盡頭	面對強勁對手，他很快就梧鼠技窮。|他雖然掌握了一些技巧，但在面對困難時卻梧鼠技窮，無計可施。
+處境困難	顛沛流離	顛簸奔波流落他鄉	形容生活動盪不安	戰亂時期，百姓顛沛流離，生活艱難。|戰爭讓許多家庭顛沛流離，生活困苦不堪。
+治理方式	垂拱而治	垂衣拱手就能治理天下	無為而治	這位領導善於用人，幾近垂拱而治。|在他的治理下，國家安定繁榮，真是垂拱而治。
+治理方式	平分秋色	平均分配秋天的景色	勢均力敵，不相上下	兩支球隊實力相當，比賽結果平分秋色。|兩隊實力相當，這場比賽最終平分秋色，難分高下。
+批評議論	品頭論足	評論頭和腳	對人或事物品頭論足	比賽結束後，觀眾們紛紛品頭論足。|他對每件事都喜歡品頭論足，總是挑剔不滿。
+批評議論	拍案叫絕	拍桌子叫好	形容十分讚賞	聽完他的提案，與會者都拍案叫絕。|他的演技令人驚嘆，觀眾不禁拍案叫絕。
+行為態度	汲汲營營	急切地追求	形容急於追求	他整天汲汲營營於事業，卻忽視了家庭。|他汲汲營營地追求名利，卻忽略了生活中的真正價值。
+行為態度	故步自封	固守舊的步伐自我封閉	守舊不肯改進	在科技快速發展的今天，故步自封將會落後。|如果總是故步自封，不願意接受新事物，必然會落後於時代。
+行為態度	食古不󠇡化	吃了古代的東西卻不消化	只知道模仿古人，不知變通	他的思想食古不化，無法適應新時代。|他雖然讀過許多書，但食古不化，思想仍然陳舊。
+形容數量	恆河沙數	恆河中沙子的數量	形容數量極多	宇宙中的星球如恆河沙數般多不勝數。|這裡的問題恆河沙數，多得讓人不知從何下手。
+形容數量	星羅棋布	星星散落如棋子佈局	形容分布眾多而有秩序	夜空中繁星星羅棋布，美不勝收。|這座城市中的古跡星羅棋布，到處都是歷史的印記。
+形容場面	烽火連天	烽火信號連接天際	形容戰火連綿不斷	戰爭時期，整個國家烽火連天。|戰爭年代，烽火連天，百姓生活在水深火熱之中。
+形容場面	哄堂大笑	整個大廳都在笑	形容眾人大笑	他講完笑話，全場頓時哄堂大笑。|他的幽默言談讓全場哄堂大笑，氣氛非常輕鬆愉快。
+形容場面	鴉雀無聲	烏鴉和麻雀都不出聲	形容非常安靜	教授一進教室，喧鬧的課堂立刻鴉雀無聲。|演講現場鴉雀無聲，大家都專注地聽著講者的發言。
+形容場面	旗開得勝	旗幟一展開就獲勝	比喻一開始就取得勝利	比賽一開始，我們隊就旗開得勝。|球隊一開賽便旗開得勝，迅速取得領先優勢。
+藝術表現	粉墨登場	化妝後登台	比喻登台演出或出現在人們面前	新演員粉墨登場，為話劇增添新氣象。|經過一番準備，他們終於粉墨登場，開始了精彩的演出。
+藝術表現	陽春白雪	春天的陽光和白雪	形容高雅的藝術	這首交響樂可謂陽春白雪，只有行家能懂。|這部作品內容深奧，風格高雅，屬於陽春白雪之作。
+短暫體驗	走馬看花	騎馬奔跑時看花	匆匆忙忙地看，無法深入了解	匆匆一天的城市觀光，只能走馬看花。|他這次旅遊時間太短，只能走馬看花，沒能細細品味當地風情。
+短暫體驗	浮光掠影	掠過的光影	形容印象粗淺	匆匆一瞥，只留下浮光掠影的印象。|他對這件事情的理解僅止於浮光掠影，並未深入探討。
+性格品質	蕙質蘭心	蕙草的質地和蘭花的心	形容女子品德高尚	這位大家閨秀蕙質蘭心，溫婉可人。|她不僅外貌出眾，還擁有蕙質蘭心的品格，讓人欽佩。
+性格品質	仁心仁術	仁慈的心和仁慈的技術	形容醫者具有仁愛之心和精湛醫術	這位醫生仁心仁術，深受病患信任。|這位醫生不僅醫術高明，還有仁心仁術，深受病人愛戴。
+虛幻不實	鏡花水月	鏡中的花和水中的月亮	比喻虛幻不實的事物	他的承諾如鏡花水月，終究是一場空。|那些美好的記憶，如今卻像鏡花水月般虛幻不實。
+虛幻不實	空穴來風	空洞的洞穴有風吹來	比喻沒有根據的傳言	這個傳言並非空穴來風，確有其事。|這些流言蜚語純屬空穴來風，毫無根據。
+形容速度	如湯沃雪	像熱水澆在雪上	形容很快消失	政府的新政策一出，市場謠言如湯沃雪般消失。|經過耐心解釋，誤會如湯沃雪，瞬間消失無蹤。
+形容速度	唾手可得	吐口水就能得到	形容容易得到	對他而言，這份工作唾手可得。|這個獎項對他來說幾乎是唾手可得，他的實力早已得到認可。
+形容氣勢	餓虎撲食	飢餓的老虎撲向食物	形容飢餓的老虎撲食的兇猛樣子	抢購活動一開始，人們就像餓虎撲食般湧入商場。|看到美味佳餚，他們像餓虎撲食般地開始用餐。
+形容氣勢	巴蛇吞象	巴蛇吞食大象	比喻吞併強大的對手	大公司巴蛇吞象般收購了多家小企業。|他過於貪心，像巴蛇吞象，最終無法承受後果。
+形容感受	心如槁木	心如枯木	形容人麻木不仁	失去至親後，他整個人心如槁木。|經歷重大變故後，他心如槁木，對周圍的一切都無動於衷。
+形容感受	甘拜下風	甘心承認不如對方	甘願承認不如別人	面對對手的精湛技藝，他不得不甘拜下風。|面對對手的出色表現，他甘拜下風，心服口服。
+形容完美	淋漓盡致	淋漓到了極致	形容表現得十分充分、透徹	這幅畫將秋天的美景描繪得淋漓盡致。|這場演出將每個角色的情感表現得淋漓盡致，觀眾深受感動。
+形容完美	嘆為觀止	嘆息認為到了極限值得觀看就止步	形容到了極點，值得觀賞讚嘆	參觀完這座古蹟，大家都嘆為觀止。|這座古蹟的建築之美，讓所有遊客嘆為觀止。
+不當行為	暴殄天物	暴殄上天賜予的物品	糟蹋物品	把好食材做成難吃的菜，真是暴殄天物。|這麼好的食材被浪費掉，簡直是暴殄天物。
+不當行為	牛刀割雞	用殺牛的刀來殺雞	比喻小題大做	派遣精英團隊處理這種小問題，真是牛刀割雞。|這麼簡單的問題，用他來解決真是牛刀割雞，大材小用。
+被動承受	殃及池魚	災禍波及池中的魚	無辜受到牽連	公司倒閉，無辜的員工也殃及池魚。|這場誤會本是小事，但後來卻殃及池魚，牽連了許多人。
+被動承受	燕雀處堂	燕子和麻雀住在大廳裡	比喻身居高位而不自知	他的才能被埋沒，真是燕雀處堂之遇。|這麼小的問題卻引發這麼大的恐慌，真是燕雀處堂。
+未能充分發揮	束之高閣	捆起來放在高處的閣樓上	把事物擱置一旁不用	這份改革方案被束之高閣，遲遲未能實施。|這項提案被束之高閣，遲遲未被實施。
+未能充分發揮	兩腳書櫥	兩條腿的書櫃	比喻只讀書而不學以致用的人	他雖然博覽群書，卻是個兩腳書櫥，不懂實際運用。|這位學者博學多才，真可謂兩腳書櫥，知識豐富。
+形容結果	虎頭蛇尾	虎頭蛇尾	開始聲勢很大，結果卻平淡	這部電影開頭精彩，結尾卻虎頭蛇尾。|他開始時充滿幹勁，但最後卻虎頭蛇尾，草草結束。
+形容結果	新亭對泣	在新亭對著哭泣	形容客居他鄉的悲傷	他們在異鄉相遇，不禁新亭對泣。|他們在困境中相遇，真是新亭對泣，共同感慨命運的無常。
+其他	勞師動眾	勞累軍隊調動眾人	形容耗費大量人力物力	為了一件小事勞師動眾，實在不值得。|這個小問題不值得勞師動眾，應該簡單處理即可。
+其他	勝之不武	勝利得不光彩	形容勝利來得不光彩	以強欺弱，即使獲勝也會讓人覺得勝之不武。|由於對手的失誤，他才獲得了勝利，但卻感到勝之不武。
+其他	聞過則喜	聽到過錯就高興	樂於接受別人的批評	一個優秀的領導應該聞過則喜，虛心接受批評。|他為人謙虛，總是聞過則喜，樂於接受別人的建議。
+其他	抱痛西河	抱著悲痛到西河	形容人死後的悲痛	失去摯友，他抱痛西河，久久不能釋懷。|他因為失去摯愛而抱痛西河，長期無法釋懷。
+其他	宜室宜家	適合房間也適合家庭	形容婦女能夠持家	這位新媳婦不僅貌美，而且宜室宜家。|這對新人恩愛和睦，真是宜室宜家。
+`;
+
+
+
+const idioms = idiomsData.trim().split('\n').slice(1).map(line => {
+    const [分類, 成語, 字面意思, 表達意思, 例句] = line.split('\t');
+    return { 分類, 成語, 字面意思, 表達意思, 例句 };
+});
+
+        const categories = [...new Set(idioms.map(idiom => idiom.分類))];
+        const categorySelect = document.getElementById('category-select');
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            categorySelect.appendChild(option);
+        });
+
+let currentIdioms = [];
+let selectedLeft = null;
+let selectedRight = null;
+let matchType = '成語-表達意思';
+let currentIndex = 0;
+let orderedIdioms = [];
+let totalRounds = 0;
+let currentRound = 0;
+const idiomsPerRound = 4;
+let startTime;
+let correctPairs = 0;
+let totalPairs = 0;
+let isSoundOn = true;
+let currentCategoryIndex = 0;
+
+const happyEmojis = "🥰😛🤗😄😍🤩😘😚😋😊😆😁😄😃";
+const sadEmojis = "😟😮🥺😧😨😥😢😭😱😖😩😤";
+
+const rightAudio = new Audio('right.mp3');
+const wrongAudio = new Audio('wrong.mp3');
+
+function playAudio(audio) {
+    if (isSoundOn) {
+        audio.currentTime = 0;
+        audio.play();
+    }
+}
+
+document.getElementById('sound-button').onclick = toggleSound;
+
+function toggleSound() {
+    isSoundOn = !isSoundOn;
+    const soundButton = document.getElementById('sound-button');
+    soundButton.textContent = isSoundOn ? '🔔' : '🔕';
+}
+
+function showEndButton() {
+    const endButton = document.getElementById('end-button');
+    endButton.classList.add('visible');
+}
+
+function hideEndButton() {
+    const endButton = document.getElementById('end-button');
+    endButton.classList.remove('visible');
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+        function selectItem(item, side) {
+            if (side === 'left') {
+                if (selectedLeft) {
+                    selectedLeft.classList.remove('selected');
+                }
+                selectedLeft = item;
+            } else {
+                if (selectedRight) {
+                    selectedRight.classList.remove('selected');
+                }
+                selectedRight = item;
+            }
+            item.classList.add('selected');
+
+            if (selectedLeft && selectedRight) {
+                checkMatch();
+            }
+        }
+
+	function stringToArray(str) {
+		return Array.from(str.match(/\P{RI}\p{RI}?\p{RI}?/gu) ?? []);
+	}
+
+	function getRandomEmoji(emojiString) {
+		const emojiArray = stringToArray(emojiString);
+		return emojiArray[Math.floor(Math.random() * emojiArray.length)];
+	}
+
+	function changeEmoji(isCorrect) {
+		const character = document.getElementById('character');
+		if (isCorrect) {
+			character.textContent = getRandomEmoji(happyEmojis);
+			character.classList.add('animated');
+			
+			setTimeout(() => {
+				character.textContent = '🙂';
+				character.classList.remove('animated');
+			}, 2000);
+		} else {
+			character.textContent = getRandomEmoji(sadEmojis);
+			character.classList.add('animated');
+		}
+	}
+
+    function checkMatch() {
+        const leftText = selectedLeft.textContent;
+        const rightText = selectedRight.textContent;
+        const correctPair = currentIdioms.find(pair => pair.left === leftText && pair.right === rightText);
+
+        if (correctPair) {
+			correctPairs++;
+			playAudio(rightAudio);
+            selectedLeft.style.backgroundColor = '#4CAF50';
+            selectedRight.style.backgroundColor = '#4CAF50';
+            selectedLeft.style.pointerEvents = 'none';
+            selectedRight.style.pointerEvents = 'none';
+			selectedLeft.classList.add('correct');
+			selectedRight.classList.add('correct');
+            selectedLeft = null;
+            selectedRight = null;
+            changeEmoji(true);
+
+            if (document.querySelectorAll('.left-item:not([style*="pointer-events: none"])').length === 0) {
+                showNextButton();
+				showEndButton();
+            }
+        } else {
+			playAudio(wrongAudio);
+            changeEmoji(false);
+            setTimeout(() => {
+                selectedLeft.classList.remove('selected');
+                selectedRight.classList.remove('selected');
+                selectedLeft = null;
+                selectedRight = null;
+            }, 500);
+        }
+		totalPairs++;
+    }
+
+
+function showResult() {
+    const endTime = new Date();
+    const timeSpent = Math.round((endTime - startTime) / 1000);
+    const accuracy = Math.round((correctPairs / totalPairs) * 100);
+
+    document.getElementById('accuracy-progress').style.width = `${accuracy}%`;
+
+    document.getElementById('accuracy').textContent = `✨正確：${accuracy}%`;
+    document.getElementById('total-rounds').textContent = `🛞回合：${currentRound}`;
+    document.getElementById('time-spent').textContent = `⏰努力：${timeSpent} 秒`;
+    document.getElementById('selected-category').textContent = `📒分類：${categorySelect.options[categorySelect.selectedIndex].text}`;
+    document.getElementById('match-type-result').textContent = `📋配對：${document.getElementById('match-type-select').options[document.getElementById('match-type-select').selectedIndex].text}`;
+    
+    const orderSelect = document.getElementById('order-select');
+    const orderText = orderSelect.options[orderSelect.selectedIndex].text;
+    document.getElementById('order-type-result').textContent = `🏷️順序：${orderText}`;
+
+    document.getElementById('game').style.display = 'none';
+    document.getElementById('result').style.display = 'block';
+}
+
+document.getElementById('end-button').onclick = function() {
+    showResult();
+};
+
+document.getElementById('return-to-setup').onclick = function() {
+    document.getElementById('result').style.display = 'none';
+    resetGame();
+};
+
+        function showNextButton() {
+            const nextButton = document.getElementById('next-button');
+            nextButton.classList.add('visible');
+        }
+
+        function hideNextButton() {
+            const nextButton = document.getElementById('next-button');
+            nextButton.classList.remove('visible');
+        }
+
+function getOrderedIdioms() {
+    const selectedCategory = categorySelect.value;
+    return selectedCategory === 'all' ? 
+        idioms.slice() : idioms.filter(idiom => idiom.分類 === selectedCategory);
+}
+
+
+function updateProgress() {
+    const progress = document.getElementById('progress');
+    const roundInfo = document.getElementById('round-info');
+    progress.style.width = `${(currentRound / totalRounds) * 100}%`;
+    roundInfo.textContent = `${currentRound}/${totalRounds}`;
+}
+
+function resetGame() {
+    currentIndex = 0;
+    currentRound = 0;
+    orderedIdioms = [];
+    correctPairs = 0;
+    totalPairs = 0;
+    hideEndButton();
+    hideNextButton();
+    document.getElementById('setup').classList.add('active');
+    document.getElementById('setup').style.display = 'block';
+    document.getElementById('game').classList.remove('active');
+    document.getElementById('game').style.display = 'none';
+}
+
+function getRandomExample(examples) {
+    const exampleArray = examples.split('|');
+    return exampleArray[Math.floor(Math.random() * exampleArray.length)].trim();
+}
+
+function startNewRound() {
+    const selectedCategory = categorySelect.value;
+    const orderType = document.getElementById('order-select').value;
+
+    if (currentIndex === 0 || currentIndex >= orderedIdioms.length) {
+        orderedIdioms = getOrderedIdioms();
+        if (orderType === 'random') {
+            shuffleArray(orderedIdioms);
+        }
+        currentIndex = 0;
+        totalRounds = Math.ceil(orderedIdioms.length / idiomsPerRound);
+        currentRound = 0;
+    }
+
+    currentIdioms = [];
+    for (let i = 0; i < idiomsPerRound && currentIndex < orderedIdioms.length; i++) {
+        const idiom = orderedIdioms[currentIndex];
+        let pair;
+        switch (matchType) {
+            case '成語-表達意思':
+                pair = { left: idiom.成語, right: idiom.表達意思 };
+                break;
+            case '成語-字面意思':
+                pair = { left: idiom.成語, right: idiom.字面意思 };
+                break;
+            case '成語-例句':
+                const randomExample = getRandomExample(idiom.例句);
+                const maskedSentence = randomExample.replace(idiom.成語, '__');
+                pair = { left: idiom.成語, right: maskedSentence };
+                break;
+        }
+        currentIdioms.push(pair);
+        currentIndex++;
+    }
+
+    currentRound++;
+    updateProgress();
+
+    const leftContainer = document.getElementById('leftContainer');
+    const rightContainer = document.getElementById('rightContainer');
+
+    leftContainer.innerHTML = '';
+    rightContainer.innerHTML = '';
+
+    // 創建左側選項
+    const leftItems = currentIdioms.map(pair => pair.left);
+    leftItems.forEach(item => {
+        const leftElement = document.createElement('div');
+        leftElement.className = 'left-item';
+        leftElement.textContent = item;
+        leftElement.onclick = () => selectItem(leftElement, 'left');
+        leftContainer.appendChild(leftElement);
+    });
+
+    // 創建右側選項（始終隨機排序）
+    const rightItems = currentIdioms.map(pair => pair.right);
+    shuffleArray(rightItems);
+    rightItems.forEach(item => {
+        const rightElement = document.createElement('div');
+        rightElement.className = 'right-item';
+        rightElement.textContent = item;
+        rightElement.onclick = () => selectItem(rightElement, 'right');
+        rightContainer.appendChild(rightElement);
+    });
+
+    //showEndButton(); // 顯示結束按鈕
+    if (currentRound === 1) {
+        startTime = new Date();
+    }
+
+}
+
+        document.getElementById('next-button').onclick = function() {
+            hideNextButton();
+			hideEndButton();
+            startNewRound();
+        };
+
+document.getElementById('start-button').onclick = function() {
+    matchType = document.getElementById('match-type-select').value;
+    document.getElementById('setup').classList.remove('active');
+    document.getElementById('setup').style.display = 'none';  // 新增這行
+    document.getElementById('game').classList.add('active');
+    document.getElementById('game').style.display = 'block';  // 修改為 'block'
+
+    currentIndex = 0;
+    currentRound = 0;
+    orderedIdioms = [];
+    startNewRound();
+};
+
+document.getElementById('close-button').onclick = function() {
+    resetGame();
+};
+
+
+
+document.getElementById('view-idioms-button').onclick = function() {
+    document.getElementById('setup').style.display = 'none';
+    document.getElementById('idiom-list').style.display = 'block';
+    renderIdiomList(); 
+};
+
+document.getElementById('close-idiom-list').onclick = function() {
+    document.getElementById('idiom-list').style.display = 'none';
+    document.getElementById('setup').style.display = 'block';
+};
+
+
+
+function replaceIdiomWithUnderscore(sentence, idiom) {
+    return sentence.replace(new RegExp(idiom, 'g'), '__');
+}
+
+function renderIdiomList() {
+    const selectedCategory = document.getElementById('category-select').value;
+    const table = document.getElementById('idiom-table');
+    const tbody = table.querySelector('tbody');
+    tbody.innerHTML = '';
+
+    // 篩選成語
+    const filteredIdioms = selectedCategory === 'all' 
+        ? idioms 
+        : idioms.filter(idiom => idiom.分類 === selectedCategory);
+
+    filteredIdioms.forEach((idiom, index) => {
+        const randomExample = getRandomExample(idiom.例句);
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="category"><small>${idiom.分類}</small></td>
+            <td class="idiom"><small class="small-number">${index + 1} </small>${idiom.成語}</td>
+            <td class="literal">${idiom.字面意思}</td>
+            <td class="figurative">${idiom.表達意思}</td>
+            <td class="example">${replaceIdiomWithUnderscore(randomExample, idiom.成語)}</td>
+        `;
+        tbody.appendChild(row);
+    });
+    
+    updateVisibility();
+    updateCategoryNavigation();
+}
+
+function updateVisibility() {
+    const showCategory = document.getElementById('show-category').checked;
+    const showIdiom = document.getElementById('show-idiom').checked;
+    const showLiteral = document.getElementById('show-literal').checked;
+    const showFigurative = document.getElementById('show-figurative').checked;
+    const showExample = document.getElementById('show-example').checked;
+
+    document.querySelectorAll('#idiom-table .category').forEach(el => el.style.display = showCategory ? '' : 'none');
+    document.querySelectorAll('#idiom-table .idiom').forEach(el => el.style.display = showIdiom ? '' : 'none');
+    document.querySelectorAll('#idiom-table .literal').forEach(el => el.style.display = showLiteral ? '' : 'none');
+    document.querySelectorAll('#idiom-table .figurative').forEach(el => el.style.display = showFigurative ? '' : 'none');
+    document.querySelectorAll('#idiom-table .example').forEach(el => el.style.display = showExample ? '' : 'none');
+}
+
+document.querySelectorAll('.idiom-controls input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', updateVisibility);
+});
+
+document.getElementById('category-select').addEventListener('change', function() {
+    renderIdiomList();
+    updateCategoryNavigation();
+});
+
+function updateCategoryNavigation() {
+    const categorySelect = document.getElementById('category-select');
+    const prevButton = document.getElementById('prev-category');
+    const nextButton = document.getElementById('next-category');
+    const categories = Array.from(categorySelect.options).map(option => option.value);
+    currentCategoryIndex = categories.indexOf(categorySelect.value);
+
+    prevButton.disabled = currentCategoryIndex <= 1;  // 禁用"全部"的上一個
+    nextButton.disabled = currentCategoryIndex >= categories.length - 1;
+
+    if (currentCategoryIndex > 0) {
+        prevButton.textContent = "< "  + categories[currentCategoryIndex - 1];
+    }
+    if (currentCategoryIndex < categories.length - 1) {
+        nextButton.textContent = categories[currentCategoryIndex + 1] + " >";
+    }
+
+    // 如果選擇的是"全部"，隱藏導航按鈕
+    const navigationDiv = document.querySelector('.category-navigation');
+    navigationDiv.style.display = categorySelect.value === 'all' ? 'none' : 'flex';
+}
+
+function changeCategory(direction) {
+    const categorySelect = document.getElementById('category-select');
+    const categories = Array.from(categorySelect.options).map(option => option.value);
+    
+    currentCategoryIndex += direction;
+    if (currentCategoryIndex < 1) currentCategoryIndex = 1;  // 不要選到"全部"
+    if (currentCategoryIndex >= categories.length) currentCategoryIndex = categories.length - 1;
+
+    categorySelect.value = categories[currentCategoryIndex];
+    renderIdiomList();
+    updateCategoryNavigation();
+}
+
+document.getElementById('prev-category').onclick = () => changeCategory(-1);
+document.getElementById('next-category').onclick = () => changeCategory(1);
+
+updateCategoryNavigation();
+
+    </script>
+</body>
+</html>
