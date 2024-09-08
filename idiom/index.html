@@ -48,22 +48,21 @@
             padding: 10px;
             border-radius: 5px;
             cursor: pointer;
-			transition: all 0.3s ease;
 			border: 2px solid #fff;			
         }
 
         .left-item:hover, .right-item:hover {
-            background-color: #d5d5d5;
+            background-color: #c0f0c0;
         }
 
         .left-item {
-			background-color: #ebebeb;
+			background-color: #f3f3f3;
 			font-family: BpmfZihiSans-Regular;	
-			font-size: 1.2em;
+			font-size: 1.3em;
         }
 
         .right-item {
-			background-color: #e8e8e8;
+			background-color: #eaeaea;
         }
 
         .selected {
@@ -131,13 +130,14 @@
         .progress-container {
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         .close-button {
-            margin-right: 10px;
+            margin-right: 40px;
             cursor: pointer;
             font-size: 20px;
         }
+
         .progress-bar {
             flex-grow: 1;
             height: 20px;
@@ -156,6 +156,7 @@
             font-weight: bold;
         }
         #character {
+		font-size: 1.5em;
             transition: transform 0.3s ease;
         }
         #character.animated {
@@ -224,6 +225,19 @@
 		}
 
 		@media (max-width: 768px) {
+			.game {
+				height: 90vh;
+				overflow-y: auto;
+				scrollbar-width: none;
+				-ms-overflow-style: none;
+			}
+
+			.game::-webkit-scrollbar {
+				display: none;
+			}
+		}
+
+		@media (max-width: 768px) {
 			.item-container {
 				flex-direction: column;
 				align-items: stretch;
@@ -257,7 +271,8 @@
 		}
 
 		.sound-button {
-			margin-right: 10px;
+
+			margin: 0px 5px;
 			cursor: pointer;
 			font-size: 20px;
 		}
@@ -294,6 +309,14 @@
     background: none;
     border: none;
     font-size: 1.5em;
+    cursor: pointer;
+    padding: 0;
+}
+
+.list-close-button {
+    background: none;
+    border: none;
+    font-size: 1.2em;
     cursor: pointer;
     padding: 0;
 }
@@ -365,8 +388,8 @@
 }
 
 .idiom {
-    min-width: 120px;
-	font-size: 1.05em;
+    min-width: 130px;
+	font-size: 1.1em;
 	font-family: BpmfZihiSans-Regular;
 }
 
@@ -433,7 +456,20 @@
     background-color: #cccccc;
     cursor: not-allowed;
 }
-
+.font-toggle-button {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid #4CAF50;
+    background-color: white;
+    color: #4CAF50;
+    font-size: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin-right: 5px;
+}
     </style>
 </head>
 <body>
@@ -467,19 +503,20 @@
 		</div>
         <div class="game" id="game">
 			<div class="progress-container">
-				<div class="close-button" id="close-button">X</div>				
+				<div class="close-button" id="close-button">✖︎</div>				
 				<div class="progress-bar">
 					<div class="progress" id="progress"></div>
 				</div>
 				<div class="round-info" id="round-info"></div>
 				<div class="sound-button" id="sound-button">🔔</div>
+				<div class="font-toggle-button" id="font-toggle-button">字</div>
 			</div>
-            <h1><span id="character">🙂</span>烏衣行成語配對</h1>
+            <h1><span id="character">🙂</span></h1>
             <div class="item-container" id="leftContainer"></div>
             <div class="item-container" id="rightContainer"></div>
             <div id="next-button-container">                
-				<button id="end-button">結束</button>
-				<button id="next-button">下一題</button>
+				<button id="end-button">🎉 結束</button>
+				<button id="next-button">下一題 🚀</button>
             </div>
         </div>
 
@@ -489,8 +526,10 @@
 				<button id="next-category" class="nav-button">下一分類</button>
 			</div>
 			<div class="idiom-header">
+			<button id="close-idiom-list" class="list-close-button">✖︎</button>
 				<h2>成語列表</h2>
-				<button id="close-idiom-list" class="close-button">X</button>
+				
+				<div class="font-toggle-button" id="list-font-toggle-button">字</div>
 			</div>
 
 			<div class="idiom-controls">
@@ -534,7 +573,7 @@
 				<p id="match-type-result"></p>
 				<p id="order-type-result"></p>
 			</div>
-			<button id="return-to-setup">返回</button>
+			<button id="return-to-setup">返回 🛸</button>
 		</div>
 
     </div>
@@ -628,9 +667,14 @@
 
 
 
+function removeBPMCharacters(str) {
+    return str.replace(/[󠇠󠇡󠇢󠇣󠇤󠇥󠇦󠇧󠇨󠇩]/gu, '');
+}
+
 const idioms = idiomsData.trim().split('\n').slice(1).map(line => {
     const [分類, 成語, 字面意思, 表達意思, 例句] = line.split('\t');
-    return { 分類, 成語, 字面意思, 表達意思, 例句 };
+    const idiomNoBPM = removeBPMCharacters(成語);
+    return { 分類, 成語, idiomNoBPM, 字面意思, 表達意思, 例句 };
 });
 
         const categories = [...new Set(idioms.map(idiom => idiom.分類))];
@@ -656,6 +700,9 @@ let correctPairs = 0;
 let totalPairs = 0;
 let isSoundOn = true;
 let currentCategoryIndex = 0;
+let currentFont = 'BpmfZihiSans-Regular';
+let currentFontState = 'zih';
+let currentFontSize = '1.3em';
 
 const happyEmojis = "🥰😛🤗😄😍🤩😘😚😋😊😆😁😄😃";
 const sadEmojis = "😟😮🥺😧😨😥😢😭😱😖😩😤";
@@ -671,6 +718,69 @@ function playAudio(audio) {
 }
 
 document.getElementById('sound-button').onclick = toggleSound;
+
+function toggleFont() {
+    const fontToggleButton = document.getElementById('font-toggle-button');
+	const ListfontToggleButton = document.getElementById('list-font-toggle-button');
+	
+    const leftItems = document.querySelectorAll('.left-item');
+	const idioms = document.querySelectorAll('.idiom');
+
+    switch(currentFontState) {
+        case 'zih':
+            currentFontState = 'box';
+            fontToggleButton.textContent = '框';
+			ListfontToggleButton.textContent = '框';
+			currentFont = 'BpmfZihiBox-R';
+			currentFontSize = '1.4em';
+
+			leftItems.forEach(item => {
+				item.style.fontFamily = 'BpmfZihiBox-R';
+				item.style.fontSize = '1.4em';
+			});
+			idioms.forEach(item => {
+				item.style.fontFamily = 'BpmfZihiBox-R';
+				item.style.fontSize = '1.4em';
+				item.style.minWidth = '160px';
+			});
+            break;
+        case 'box':
+            currentFontState = 'bpmf';
+            fontToggleButton.textContent = '音';
+			ListfontToggleButton.textContent = '音';
+			currentFont = 'BpmfZihiOnly-R';
+			currentFontSize = '2em';
+
+			leftItems.forEach(item => {
+				item.style.fontFamily = 'BpmfZihiOnly-R';
+				item.style.fontSize = '2em';
+			}); 
+			idioms.forEach(item => {
+				item.style.fontFamily = 'BpmfZihiOnly-R';
+				item.style.fontSize = '1.6em';
+				item.style.minWidth = '120px';
+			}); 
+            break;
+        case 'bpmf':
+            currentFontState = 'zih';
+            fontToggleButton.textContent = '字';
+			ListfontToggleButton.textContent = '字';
+			currentFont = 'BpmfZihiSans-Regular';
+			currentFontSize = '1.3em';
+
+			leftItems.forEach(item => {
+				item.style.fontFamily = 'BpmfZihiSans-Regular';
+				item.style.fontSize = '1.3em';
+			}); 
+			idioms.forEach(item => {
+				item.style.fontFamily = 'BpmfZihiSans-Regular';
+				item.style.fontSize = '1em';
+				item.style.minWidth = '120px';
+
+			}); 
+            break;
+    }
+}
 
 function toggleSound() {
     isSoundOn = !isSoundOn;
@@ -728,11 +838,13 @@ function shuffleArray(array) {
 		if (isCorrect) {
 			character.textContent = getRandomEmoji(happyEmojis);
 			character.classList.add('animated');
-			
+
+			/*
 			setTimeout(() => {
 				character.textContent = '🙂';
 				character.classList.remove('animated');
 			}, 2000);
+			*/
 		} else {
 			character.textContent = getRandomEmoji(sadEmojis);
 			character.classList.add('animated');
@@ -758,8 +870,12 @@ function shuffleArray(array) {
             changeEmoji(true);
 
             if (document.querySelectorAll('.left-item:not([style*="pointer-events: none"])').length === 0) {
-                showNextButton();
-				showEndButton();
+				if(currentRound >= totalRounds){
+					showEndButton();
+				} else {
+					showNextButton();
+					showEndButton();
+				}
             }
         } else {
 			playAudio(wrongAudio);
@@ -783,10 +899,10 @@ function showResult() {
     document.getElementById('accuracy-progress').style.width = `${accuracy}%`;
 
     document.getElementById('accuracy').textContent = `✨正確：${accuracy}%`;
-    document.getElementById('total-rounds').textContent = `🛞回合：${currentRound}`;
+    document.getElementById('total-rounds').textContent = `🎡回合：${currentRound}`;
     document.getElementById('time-spent').textContent = `⏰努力：${timeSpent} 秒`;
     document.getElementById('selected-category').textContent = `📒分類：${categorySelect.options[categorySelect.selectedIndex].text}`;
-    document.getElementById('match-type-result').textContent = `📋配對：${document.getElementById('match-type-select').options[document.getElementById('match-type-select').selectedIndex].text}`;
+    document.getElementById('match-type-result').textContent = `🪧配對：${document.getElementById('match-type-select').options[document.getElementById('match-type-select').selectedIndex].text}`;
     
     const orderSelect = document.getElementById('order-select');
     const orderText = orderSelect.options[orderSelect.selectedIndex].text;
@@ -875,7 +991,7 @@ function startNewRound() {
                 break;
             case '成語-例句':
                 const randomExample = getRandomExample(idiom.例句);
-                const maskedSentence = randomExample.replace(idiom.成語, '__');
+                const maskedSentence = randomExample.replace(idiom.idiomNoBPM, '🙈');
                 pair = { left: idiom.成語, right: maskedSentence };
                 break;
         }
@@ -892,15 +1008,20 @@ function startNewRound() {
     leftContainer.innerHTML = '';
     rightContainer.innerHTML = '';
 
+
     // 創建左側選項
     const leftItems = currentIdioms.map(pair => pair.left);
+
     leftItems.forEach(item => {
         const leftElement = document.createElement('div');
         leftElement.className = 'left-item';
+		leftElement.style.fontFamily = currentFont;
+		leftElement.style.fontSize = currentFontSize;		
         leftElement.textContent = item;
         leftElement.onclick = () => selectItem(leftElement, 'left');
         leftContainer.appendChild(leftElement);
     });
+
 
     // 創建右側選項（始終隨機排序）
     const rightItems = currentIdioms.map(pair => pair.right);
@@ -913,12 +1034,16 @@ function startNewRound() {
         rightContainer.appendChild(rightElement);
     });
 
-    //showEndButton(); // 顯示結束按鈕
     if (currentRound === 1) {
         startTime = new Date();
     }
 
 }
+
+
+
+
+
 
         document.getElementById('next-button').onclick = function() {
             hideNextButton();
@@ -929,9 +1054,9 @@ function startNewRound() {
 document.getElementById('start-button').onclick = function() {
     matchType = document.getElementById('match-type-select').value;
     document.getElementById('setup').classList.remove('active');
-    document.getElementById('setup').style.display = 'none';  // 新增這行
+    document.getElementById('setup').style.display = 'none';
     document.getElementById('game').classList.add('active');
-    document.getElementById('game').style.display = 'block';  // 修改為 'block'
+    document.getElementById('game').style.display = 'block';
 
     currentIndex = 0;
     currentRound = 0;
@@ -959,7 +1084,7 @@ document.getElementById('close-idiom-list').onclick = function() {
 
 
 function replaceIdiomWithUnderscore(sentence, idiom) {
-    return sentence.replace(new RegExp(idiom, 'g'), '__');
+    return sentence.replace(new RegExp(idiom, 'g'), '🙈');
 }
 
 function renderIdiomList() {
@@ -978,14 +1103,19 @@ function renderIdiomList() {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td class="category"><small>${idiom.分類}</small></td>
-            <td class="idiom"><small class="small-number">${index + 1} </small>${idiom.成語}</td>
+            <td><small class="small-number">${index + 1} </small><span class="idiom">${idiom.成語}</span></td>
             <td class="literal">${idiom.字面意思}</td>
             <td class="figurative">${idiom.表達意思}</td>
-            <td class="example">${replaceIdiomWithUnderscore(randomExample, idiom.成語)}</td>
+            <td class="example">${replaceIdiomWithUnderscore(randomExample, idiom.idiomNoBPM)}</td>
         `;
         tbody.appendChild(row);
     });
-    
+
+	const idiomList = document.querySelectorAll('.idiom');
+    idiomList.forEach(item => {
+		item.style.fontFamily = currentFont;
+    });
+
     updateVisibility();
     updateCategoryNavigation();
 }
@@ -1052,6 +1182,11 @@ document.getElementById('prev-category').onclick = () => changeCategory(-1);
 document.getElementById('next-category').onclick = () => changeCategory(1);
 
 updateCategoryNavigation();
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('font-toggle-button').addEventListener('click', toggleFont);
+	document.getElementById('list-font-toggle-button').addEventListener('click', toggleFont);	
+});
 
     </script>
 </body>
