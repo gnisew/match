@@ -147,7 +147,7 @@
         }
         .progress {
             height: 100%;
-            background-color: #4CAF50;
+            background-color: orange;
             width: 0%;
             transition: width 0.3s ease;
         }
@@ -201,7 +201,7 @@
 
 		#accuracy-progress {
 			height: 100%;
-			background-color: #4CAF50;
+			background-color: orange;
 			width: 0%;
 			transition: width 0.5s ease-in-out;
 		}
@@ -477,6 +477,35 @@
     cursor: pointer;
     margin-right: 5px;
 }
+
+#clear-records {
+    background-color: #f44336; /* 紅色背景 */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    margin: 10px 5px 0 5px;
+    cursor: pointer;
+    border-radius: 50px;
+    transition: background-color 0.3s;
+}
+
+#clear-records:hover {
+    background-color: #d32f2f;
+}
+
+#clear-records:active {
+    background-color: #b71c1c;
+}
+
+#clear-records:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+}
     </style>
 </head>
 <body>
@@ -534,7 +563,7 @@
 			</div>
 			<div class="idiom-header">
 			<button id="close-idiom-list" class="list-close-button">✖︎</button>
-				<h2>成語列表</h2>
+				<h2>🥷烏衣行成語</h2>
 				
 				<div class="font-toggle-button" id="list-font-toggle-button">字</div>
 			</div>
@@ -580,6 +609,7 @@
 				<p id="match-type-result"></p>
 				<p id="order-type-result"></p>
 			</div>
+			<button id="clear-records" disabled>清除紀錄 🗑️</button>
 			<button id="return-to-setup">返回 🛸</button>
 		</div>
 
@@ -709,6 +739,7 @@ let currentCategoryIndex = 0;
 let currentFont = 'BpmfZihiSans-Regular';
 let currentFontState = 'zih';
 let currentFontSize = '1.3em';
+const idiomLocalName = "j01";
 
 const happyEmojis = "🥰😛🤗😄😍🤩😘😚😋😊😆😁😄😃";
 const sadEmojis = "😟😮🥺😧😨😥😢😭😱😖😩😤";
@@ -721,6 +752,29 @@ function playAudio(audio) {
         audio.currentTime = 0;
         audio.play();
     }
+}
+
+// 從 localStorage 讀取錯誤記錄
+function getErrorRecords() {
+    const records = localStorage.getItem(`${idiomLocalName}_errorRecords`);
+    return records ? JSON.parse(records) : {};
+}
+
+// 保存錯誤記錄到 localStorage
+function saveErrorRecords(records) {
+    localStorage.setItem(`${idiomLocalName}_errorRecords`, JSON.stringify(records));
+}
+
+// 更新錯誤記錄
+function updateErrorRecord(idiom) {
+    const records = getErrorRecords();
+    records[idiom] = (records[idiom] || 0) + 1;
+    saveErrorRecords(records);
+}
+
+// 清除錯誤記錄
+function clearErrorRecords() {
+    localStorage.removeItem(`${idiomLocalName}_errorRecords`);
 }
 
 document.getElementById('sound-button').onclick = toggleSound;
@@ -864,6 +918,7 @@ function shuffleArray(array) {
         const leftText = selectedLeft.textContent;
         const rightText = selectedRight.textContent;
         const correctPair = currentIdioms.find(pair => pair.left === leftText && pair.right === rightText);
+		const leftItems = document.querySelectorAll('.left-item');
 		const nextButton = document.getElementById('next-button');
 		const endButton = document.getElementById('end-button');
 
@@ -881,6 +936,10 @@ function shuffleArray(array) {
             changeEmoji(true);
 
             if (document.querySelectorAll('.left-item:not([style*="pointer-events: none"])').length === 0) {
+    			leftItems.forEach(item => {
+					item.style.fontFamily = 'BpmfZihiSans-Regular';
+					item.style.fontSize = '1.3em';
+				});  
 				if(currentRound >= totalRounds){
 					showEndButton();
 					endButton.focus();									
@@ -892,14 +951,15 @@ function shuffleArray(array) {
             }
         } else {
 			playAudio(wrongAudio);
-            changeEmoji(false);
-            setTimeout(() => {
-                selectedLeft.classList.remove('selected');
-                selectedRight.classList.remove('selected');
-                selectedLeft = null;
-                selectedRight = null;
-            }, 500);
-        }
+			changeEmoji(false);
+			updateErrorRecord(selectedLeft.textContent);
+			setTimeout(() => {
+				selectedLeft.classList.remove('selected');
+				selectedRight.classList.remove('selected');
+				selectedLeft = null;
+				selectedRight = null;
+			}, 100);
+		}
 		totalPairs++;
     }
 
@@ -921,6 +981,8 @@ function showResult() {
     const orderText = orderSelect.options[orderSelect.selectedIndex].text;
     document.getElementById('order-type-result').textContent = `🏷️順序：${orderText}`;
 
+    updateClearRecordsButton();
+
     document.getElementById('game').style.display = 'none';
     document.getElementById('result').style.display = 'block';
 }
@@ -931,7 +993,9 @@ document.getElementById('end-button').onclick = function() {
 
 document.getElementById('return-to-setup').onclick = function() {
     document.getElementById('result').style.display = 'none';
-    resetGame();
+	initializeCategories();
+	resetGame();
+	
 };
 
         function showNextButton() {
@@ -947,8 +1011,21 @@ document.getElementById('return-to-setup').onclick = function() {
 
 function getOrderedIdioms() {
     const selectedCategory = categorySelect.value;
-    return selectedCategory === 'all' ? 
-        idioms.slice() : idioms.filter(idiom => idiom.分類 === selectedCategory);
+    let filteredIdioms;
+
+    if (selectedCategory === 'error') {
+        const errorRecords = getErrorRecords();
+        filteredIdioms = idioms.filter(idiom => errorRecords.hasOwnProperty(idiom.成語));
+        
+        if (document.getElementById('order-select').value === 'sequential') {
+            filteredIdioms.sort((a, b) => errorRecords[b.成語] - errorRecords[a.成語]);
+        }
+    } else {
+        filteredIdioms = selectedCategory === 'all' ? 
+            idioms.slice() : idioms.filter(idiom => idiom.分類 === selectedCategory);
+    }
+
+    return filteredIdioms;
 }
 
 
@@ -990,7 +1067,7 @@ function startNewRound() {
 
     if (currentIndex === 0 || currentIndex >= orderedIdioms.length) {
         orderedIdioms = getOrderedIdioms();
-        if (orderType === 'random') {
+        if (orderType === 'random' || (selectedCategory === 'error' && orderType === 'sequential')) {
             shuffleArray(orderedIdioms);
         }
         currentIndex = 0;
@@ -1086,6 +1163,7 @@ document.getElementById('start-button').onclick = function() {
 
 document.getElementById('close-button').onclick = function() {
     resetGame();
+	initializeCategories();
 };
 
 
@@ -1121,9 +1199,16 @@ function renderIdiomList() {
     tbody.innerHTML = '';
 
     // 篩選成語
-    const filteredIdioms = selectedCategory === 'all' 
-        ? idioms 
-        : idioms.filter(idiom => idiom.分類 === selectedCategory);
+    let filteredIdioms;
+    if (selectedCategory === 'error') {
+        const errorRecords = getErrorRecords();
+        filteredIdioms = idioms.filter(idiom => errorRecords.hasOwnProperty(idiom.成語));
+        filteredIdioms.sort((a, b) => errorRecords[b.成語] - errorRecords[a.成語]);
+    } else {
+        filteredIdioms = selectedCategory === 'all' 
+            ? idioms 
+            : idioms.filter(idiom => idiom.分類 === selectedCategory);
+    }
 
     filteredIdioms.forEach((idiom, index) => {
         const randomExample = getRandomExample(idiom.例句);
@@ -1214,6 +1299,58 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('font-toggle-button').addEventListener('click', toggleFont);
 	document.getElementById('list-font-toggle-button').addEventListener('click', toggleFont);	
 });
+
+document.getElementById('clear-records').onclick = function() {
+    if (confirm('確定要清除所有錯誤記錄嗎？')) {
+        clearErrorRecords();
+        alert('錯誤記錄已清除');        
+        // 清除記錄後，需要更新類別列表，移除「常錯挑戰」選項
+        initializeCategories();
+        
+        // 如果當前在「常錯挑戰」類別，則切換到「所有分類」
+        if (categorySelect.value === 'error') {
+            categorySelect.value = 'all';
+        }        
+        // 更新類別導航按鈕
+        updateCategoryNavigation();
+        // 更新清除紀錄按鈕狀態
+        updateClearRecordsButton();
+    }
+};
+
+function initializeCategories() {
+    const categories = ['all', ...new Set(idioms.map(idiom => idiom.分類))];
+    const categorySelect = document.getElementById('category-select');
+    categorySelect.innerHTML = '';
+
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category === 'all' ? 'all' : category;
+        option.textContent = category === 'all' ? '所有分類' : category;
+        categorySelect.appendChild(option);
+    });
+
+    const errorRecords = getErrorRecords();
+    if (Object.keys(errorRecords).length > 0) {
+        const errorOption = document.createElement('option');
+        errorOption.value = 'error';
+        errorOption.textContent = '常錯挑戰';
+        categorySelect.appendChild(errorOption);
+    }
+}
+
+function updateClearRecordsButton() {
+    const clearRecordsButton = document.getElementById('clear-records');
+    const errorRecords = getErrorRecords();
+    const hasErrors = Object.keys(errorRecords).length > 0;
+    
+    clearRecordsButton.disabled = !hasErrors;
+    clearRecordsButton.style.opacity = hasErrors ? '1' : '0.5';
+    clearRecordsButton.style.cursor = hasErrors ? 'pointer' : 'not-allowed';
+}
+
+// 在頁面載入時調用此函數
+document.addEventListener('DOMContentLoaded', initializeCategories);
 
     </script>
 </body>
