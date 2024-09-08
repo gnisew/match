@@ -722,7 +722,7 @@ document.getElementById('sound-button').onclick = toggleSound;
 function toggleFont() {
     const fontToggleButton = document.getElementById('font-toggle-button');
 	const ListfontToggleButton = document.getElementById('list-font-toggle-button');
-	
+
     const leftItems = document.querySelectorAll('.left-item');
 	const idioms = document.querySelectorAll('.idiom');
 
@@ -1070,7 +1070,14 @@ document.getElementById('close-button').onclick = function() {
 
 
 
-document.getElementById('view-idioms-button').onclick = function() {
+document.getElementById('view-idioms-button').onclick = function() {//here
+	currentFont = 'BpmfZihiSans-Regular';
+	currentFontState = 'zih';
+	currentFontSize = '1.3em';
+    const fontToggleButton = document.getElementById('font-toggle-button');
+	const ListfontToggleButton = document.getElementById('list-font-toggle-button');
+	fontToggleButton.textContent = '字';
+	ListfontToggleButton.textContent = '字';
     document.getElementById('setup').style.display = 'none';
     document.getElementById('idiom-list').style.display = 'block';
     renderIdiomList(); 
