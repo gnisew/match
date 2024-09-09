@@ -439,12 +439,6 @@
     }
 }
 
-.category-navigation {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0px;
-}
-
 .nav-button {
     padding: 5px 10px;
     background-color: #4CAF50;
@@ -557,15 +551,11 @@
         </div>
 
 		<div class="idiom-list" id="idiom-list" style="display: none;">
-			<div class="category-navigation">
-				<button id="prev-category" class="nav-button">上一分類</button>
-				<button id="next-category" class="nav-button">下一分類</button>
-			</div>
 			<div class="idiom-header">
-			<button id="close-idiom-list" class="list-close-button">✖︎</button>
+			<button id="close-idiom-list" class="list-close-button">✖︎</button><button id="prev-category" class="nav-button">上一分類</button>
 				<h2>🥷烏衣行成語</h2>
 				
-				<div class="font-toggle-button" id="list-font-toggle-button">字</div>
+				<button id="next-category" class="nav-button">下一分類</button><div class="font-toggle-button" id="list-font-toggle-button">字</div>
 			</div>
 
 			<div class="idiom-controls">
@@ -994,8 +984,7 @@ document.getElementById('end-button').onclick = function() {
 document.getElementById('return-to-setup').onclick = function() {
     document.getElementById('result').style.display = 'none';
 	initializeCategories();
-	resetGame();
-	
+	resetGame();	
 };
 
         function showNextButton() {
@@ -1013,7 +1002,7 @@ function getOrderedIdioms() {
     const selectedCategory = categorySelect.value;
     let filteredIdioms;
 
-    if (selectedCategory === 'error') {
+    if (selectedCategory === '常錯挑戰') {
         const errorRecords = getErrorRecords();
         filteredIdioms = idioms.filter(idiom => errorRecords.hasOwnProperty(idiom.成語));
         
@@ -1048,6 +1037,7 @@ function resetGame() {
     document.getElementById('setup').style.display = 'block';
     document.getElementById('game').classList.remove('active');
     document.getElementById('game').style.display = 'none';
+	
 }
 
 function getRandomExample(examples) {
@@ -1067,7 +1057,7 @@ function startNewRound() {
 
     if (currentIndex === 0 || currentIndex >= orderedIdioms.length) {
         orderedIdioms = getOrderedIdioms();
-        if (orderType === 'random' || (selectedCategory === 'error' && orderType === 'sequential')) {
+        if (orderType === 'random' || (selectedCategory === '常錯挑戰' && orderType === 'sequential')) {
             shuffleArray(orderedIdioms);
         }
         currentIndex = 0;
@@ -1162,8 +1152,7 @@ document.getElementById('start-button').onclick = function() {
 };
 
 document.getElementById('close-button').onclick = function() {
-    resetGame();
-	initializeCategories();
+    resetGame();	
 };
 
 
@@ -1200,7 +1189,7 @@ function renderIdiomList() {
 
     // 篩選成語
     let filteredIdioms;
-    if (selectedCategory === 'error') {
+    if (selectedCategory === '常錯挑戰') {
         const errorRecords = getErrorRecords();
         filteredIdioms = idioms.filter(idiom => errorRecords.hasOwnProperty(idiom.成語));
         filteredIdioms.sort((a, b) => errorRecords[b.成語] - errorRecords[a.成語]);
@@ -1271,10 +1260,6 @@ function updateCategoryNavigation() {
     if (currentCategoryIndex < categories.length - 1) {
         nextButton.textContent = categories[currentCategoryIndex + 1] + " >";
     }
-
-    // 如果選擇的是"全部"，隱藏導航按鈕
-    const navigationDiv = document.querySelector('.category-navigation');
-    navigationDiv.style.display = categorySelect.value === 'all' ? 'none' : 'flex';
 }
 
 function changeCategory(direction) {
@@ -1308,7 +1293,7 @@ document.getElementById('clear-records').onclick = function() {
         initializeCategories();
         
         // 如果當前在「常錯挑戰」類別，則切換到「所有分類」
-        if (categorySelect.value === 'error') {
+        if (categorySelect.value === '常錯挑戰') {
             categorySelect.value = 'all';
         }        
         // 更新類別導航按鈕
@@ -1333,7 +1318,7 @@ function initializeCategories() {
     const errorRecords = getErrorRecords();
     if (Object.keys(errorRecords).length > 0) {
         const errorOption = document.createElement('option');
-        errorOption.value = 'error';
+        errorOption.value = '常錯挑戰';
         errorOption.textContent = '常錯挑戰';
         categorySelect.appendChild(errorOption);
     }
