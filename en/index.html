@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🥷烏衣行 英語遊戲</title>
+    <title>🥷烏衣行英語遊戲</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,65 +17,12 @@
         #game-container {
             text-align: center;
         }
-body {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-}
-
-#game-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
-#game-board {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    padding-top: 20px;
-    overflow-y: auto;
-}
 		#game-board {
 			display: grid;
 			grid-template-columns: repeat(3, 1fr);
 			gap: 10px;
 			margin-top: 20px;
 		}
-.word-display {
-    font-size: 36px;
-    margin-bottom: 20px;
-    text-align: center;
-    word-break: break-all;
-}
-
-#game-board input {
-    font-size: 36px;
-    padding: 10px 15px;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    text-align: center;
-    width: 80%;
-    max-width: 300px;
-    outline: none;
-    transition: border-color 0.3s;
-    margin-bottom: 20px;
-}
-
-@media (max-height: 500px) {
-    .word-display {
-        font-size: 24px;
-        margin-bottom: 10px;
-    }
-
-    #game-board input {
-        font-size: 24px;
-        padding: 5px 10px;
-    }
-}
-
 		/* 手機版面調整 */
 		@media (max-width: 600px) {
 			#game-board {
@@ -451,7 +398,6 @@ input:-moz-placeholder {
 </head>
 <body>
     <div id="game-container">
-	    <div id="game-board" style="display: none;"></div>
         <button id="return-button" style="display: none;" onclick="returnToSetup()">X</button>
         <div id="stats">
             時間：<span id="time">00:00</span><br>
@@ -488,7 +434,7 @@ input:-moz-placeholder {
 			<button onclick="startSpellingGame()">開始拼字</button>
 			<button id="view-words-btn" onclick="showWordList()">檢視語詞</button>
         </div>
-
+        <div id="game-board" style="display: none;"></div>
         <div id="game-controls" style="display: none;">
             <button onclick="continueGame()">繼續</button>
             <button onclick="returnToSetup()">返回</button>
@@ -987,7 +933,6 @@ function startSpellingGame() {
 function renderSpellingGame() {
     const gameBoard = document.getElementById('game-board');
     gameBoard.innerHTML = '';
-	gameBoard.scrollTop = 0; 
 
     if (spellingRound <= 5) {
         const currentSpellingWord = spellingWords[spellingRound - 1];
