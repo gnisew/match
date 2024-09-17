@@ -514,8 +514,8 @@
     justify-content: center;
     flex-wrap: wrap;
     min-height: 65px;
-    border-bottom: 2px solid #333;
-    width: 100%;
+    border-bottom: 2px solid #eee;
+    width: 90%;
     padding: 10px;
     margin-bottom: 10px;
 }
@@ -529,7 +529,7 @@
 }
 
 .character-option, .in-answer {
-    font-size: 1.2em;
+    font-size: 1.5em;
     margin: 5px;
     padding: 8px;
     background-color: #f0f0f0;
@@ -550,9 +550,7 @@
 }
 
 .check-button:disabled {
-    background-color: #cccccc;
-    color: #666666;
-
+	visibility: hidden;
 }
 
 .idiom-question {
@@ -576,6 +574,27 @@
     cursor: pointer;
     display: inline-block;
 }
+
+        @keyframes jumpAnimation {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes shakeAnimation {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-3px); }
+            75% { transform: translateX(3px); }
+        }
+
+        .jump {
+            animation: jumpAnimation 0.3s ease;
+        }
+
+        .shake {
+            animation: shakeAnimation 0.3s ease;
+        }
+
+
     </style>
 </head>
 <body>
@@ -1178,9 +1197,6 @@ function startNewRound() {
         currentRound = 0;
     }
 
-
-
-
     currentRound++;
     updateProgress();
 
@@ -1257,6 +1273,8 @@ function setupSortingGame(idiom) {
     const wrongChars = pinyinArray.map(pinyin => 
         getRandomCharForPinyin(pinyin, correctChars)
     ).filter(char => char); // 過濾掉可能的 undefined
+
+	//here
 
     const allChars = [...correctChars, ...wrongChars];
     shuffleArray(allChars);
@@ -1346,6 +1364,10 @@ function checkSortingAnswer(idiom) {
 
     if (userAnswer === idiom.idiomNoBPM) {
         // 答案正確
+        answerArea.classList.add('jump');
+        setTimeout(() => {
+            answerArea.classList.remove('jump');
+        }, 500);
         playAudio(rightAudio);
         changeEmoji(true);
         correctPairs++;
@@ -1363,28 +1385,32 @@ function checkSortingAnswer(idiom) {
         playAudio(wrongAudio);
         changeEmoji(false);
         updateErrorRecord(idiom.成語);
+		answerArea.classList.add('shake');
 
-        // 將答案區的元素依序移回選項區
-        const answerElements = Array.from(answerArea.children);
-        answerElements.forEach(char => {
-            // 找到對應的原始選項
-            const originalOption = Array.from(characterOptions.children)
-                .find(el => el.textContent === char.textContent && el.style.display === 'none');
-            
-            if (originalOption) {
-                // 如果找到原始選項，則恢復其顯示
-                originalOption.style.display = '';
-            } else {
-                // 如果沒找到原始選項（不應該發生），則創建一個新的
-                const newOption = char.cloneNode(true);
-                newOption.classList.remove('in-answer');
-                newOption.classList.add('character-option');
-                characterOptions.appendChild(newOption);
-            }
-            
-            // 移除答案區的元素
-            char.remove();
-        });
+		setTimeout(() => {
+			answerArea.classList.remove('shake');
+			// 將答案區的元素依序移回選項區
+			const answerElements = Array.from(answerArea.children);
+			answerElements.forEach(char => {
+				// 找到對應的原始選項
+				const originalOption = Array.from(characterOptions.children)
+					.find(el => el.textContent === char.textContent && el.style.display === 'none');
+				
+				if (originalOption) {
+					// 如果找到原始選項，則恢復其顯示
+					originalOption.style.display = '';
+				} else {
+					// 如果沒找到原始選項（不應該發生），則創建一個新的
+					const newOption = char.cloneNode(true);
+					newOption.classList.remove('in-answer');
+					newOption.classList.add('character-option');
+					characterOptions.appendChild(newOption);
+				}
+				
+				// 移除答案區的元素
+				char.remove();
+			});
+		}, 1000);
         
         checkButton.disabled = true; // 重置後禁用確定按鈕
     }
