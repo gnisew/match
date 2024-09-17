@@ -7,6 +7,7 @@
 	<link rel="stylesheet" href="https://oikasu1.github.io/fonts/twfonts.css">
 	<script src="dict.js"></script>
     <style>
+
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -73,6 +74,16 @@
 
         .selected:hover {
             background-color: #299920;
+            color: white;
+        }
+
+        .selected-wrong {
+            background-color: #CC5550;
+            color: white;
+        }
+
+        .selected-wrong:hover {
+            background-color: #CC5550;
             color: white;
         }
 
@@ -1040,8 +1051,20 @@ function shuffleArray(array) {
         if (correctPair) {
 			correctPairs++;
 			playAudio(rightAudio);
-            selectedLeft.style.backgroundColor = '#4CAF50';
-            selectedRight.style.backgroundColor = '#4CAF50';
+            
+            
+			selectedLeft.classList.add('jump');
+			setTimeout(() => {
+				selectedLeft.classList.remove('jump');
+				selectedLeft.style.backgroundColor = '#4CAF50';				
+			}, 500);
+
+			selectedRight.classList.add('jump');
+			setTimeout(() => {
+				selectedRight.classList.remove('jump');
+				selectedRight.style.backgroundColor = '#4CAF50';				
+			}, 500);
+
             selectedLeft.style.pointerEvents = 'none';
             selectedRight.style.pointerEvents = 'none';
 			selectedLeft.classList.add('correct');
@@ -1068,15 +1091,30 @@ function shuffleArray(array) {
 			playAudio(wrongAudio);
 			changeEmoji(false);
 			updateErrorRecord(selectedLeft.textContent);
+
+
+
+			selectedLeft.classList.add('shake');
+			selectedLeft.classList.add('selected-wrong');
+			selectedLeft.classList.remove('selected');
 			setTimeout(() => {
-				selectedLeft.classList.remove('selected');
-				selectedRight.classList.remove('selected');
+				selectedLeft.classList.remove('shake');	
+				selectedLeft.classList.remove('selected-wrong');
 				selectedLeft = null;
+			}, 500);
+
+			selectedRight.classList.add('shake');
+			selectedRight.classList.add('selected-wrong');
+			selectedRight.classList.remove('selected');
+			setTimeout(() => {
+				selectedRight.classList.remove('shake');	
+				selectedRight.classList.remove('selected-wrong');
 				selectedRight = null;
-			}, 100);
+			}, 500);
 		}
 		totalPairs++;
     }
+
 
 
 function showResult() {
