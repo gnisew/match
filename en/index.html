@@ -318,8 +318,8 @@ h2 {
 
 		#word-list-table .clickable {
 			cursor: pointer;
-			color: #0000FF;
 			text-decoration: none;
+			color: #333;
 		}
 
 		#saved-wordlists {
@@ -393,6 +393,224 @@ input:-moz-placeholder {
 
 
 
+#column-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+#column-checkboxes label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+#column-checkboxes input[type="checkbox"] {
+    margin-right: 5px;
+}
+.clickable {
+  cursor: pointer;
+  text-decoration: underline;
+  color: #0000FF;
+}
+
+.clickable:hover {
+  background-color: #f0f0f0;
+}
+
+
+
+
+
+
+
+
+
+
+.game-container {  
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  padding: 40px 20px 20px;
+  margin-top: 20px;
+  box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+  position: relative;
+}
+
+.game-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.game-question {
+  font-size: 1.2em;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.word-tile {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.word-tile:hover {
+  background-color: #e6e6e6;
+}
+
+.answer-area {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  min-height: 60px;
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.answer-area::after {
+  content: '';
+  width: 100%;
+  border-bottom: 2px solid #ddd;
+  margin-top: 10px;
+}
+
+.word-bank {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.game-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.game-controls button {
+  padding: 10px 20px;
+  font-size: 1em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #888;
+}
+
+#checkButton {
+  background-color: #4CAF50;
+  color: white;
+}
+
+#checkButton:hover {
+  background-color: #45a049;
+}
+
+#nextButton {
+  background-color: #008CBA;
+  color: white;
+}
+
+#nextButton:hover {
+  background-color: #007aa3;
+}
+
+
+.progress-bar-container {
+  position: absolute;
+  top: 15px;
+  right: 10px;
+  left: 60px;
+  margin-right: 60px;
+  font-size: 14px;
+}
+.progress-bar-background {
+  width: 100%;
+  height: 20px;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: #4CAF50;
+  width: 0;
+  transition: width 0.3s ease-in-out;
+}
+.progress-text {
+  position: absolute;
+  top: -2px;
+  right: 20px;
+  text-align: center;
+  margin-top: 5px;
+  color: white;
+}
+
+
+  .audio-button-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: 10px 0;
+  }
+    .mute-button {
+  position: absolute;
+  top: 5px;
+  right: 0px;
+        background: none;
+        border: none;
+        font-size: 22px;
+        cursor: pointer;
+    }
+
+@keyframes jumpAnimation {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+@keyframes shakeAnimation {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+}
+
+.jump {
+    animation: jumpAnimation 0.3s ease;
+}
+
+.shake {
+    animation: shakeAnimation 0.3s ease;
+}
+
+#gameResult {
+  position: relative;
+  z-index: 1001;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
 
     </style>
 </head>
@@ -432,6 +650,7 @@ input:-moz-placeholder {
             </select>
             <button onclick="startGame()">開始配對</button>
 			<button onclick="startSpellingGame()">開始拼字</button>
+			<button onclick="startSentenceGame()" class="game-button">開始排序</button>
 			<button id="view-words-btn" onclick="showWordList()">檢視語詞</button>
         </div>
         <div id="game-board" style="display: none;"></div>
@@ -439,6 +658,42 @@ input:-moz-placeholder {
             <button onclick="continueGame()">繼續</button>
             <button onclick="returnToSetup()">返回</button>
         </div>
+
+
+<div id="gameContainer" class="game-container" style="display: none;">
+    <button id="closeButton" class="close-button" onclick="closeGame()">X</button>
+    <div class="progress-bar-container">
+        <div class="progress-bar-background">            
+            <div class="progress-bar-fill"></div>
+        </div>
+        <div class="progress-text"></div>
+    </div>
+    <button id="muteButton" class="mute-button" onclick="toggleMute()">🔊</button>
+    <div id="gameContent" class="game-content">
+        <div class="audio-button-container">
+            <button id="gameAudioButton" class="audio-button" onclick="playGameAudio()">🔊</button>
+        </div>
+        <h2 id="gameQuestion" class="game-question"></h2>
+        <div id="answerArea" class="answer-area"></div>
+        <div id="wordBank" class="word-bank"></div>
+        <div class="game-controls">                
+            <button id="checkButton" onclick="checkAnswer()">確認</button>
+            <button id="endGameButton" class="end-game-button" onclick="endGame()" style="display: none;">結束</button>
+            <button id="nextButton" onclick="nextQuestion()" style="display: none;">繼續</button>
+        </div>
+    </div>
+</div>
+
+	  <div id="gameResult" class="game-result" style="display: none;">
+		<h2>🎊 遊戲結束 🎊</h2>
+		<p>您已完成所有句子！</p>
+		<div class="result-stats">
+		  <p>正確率：<span id="accuracyRate"></span></p>
+		</div>
+		<button id="closeGameButton" onclick="closeGame()">關閉</button>
+		<button id="restartButton" onclick="restartGame()">重新開始</button>
+		<button id="nextButton2" onclick="nextQuestion2()" style="display: none;">繼續</button>
+	  </div>
 
 
         <div id="word-list-modal">
@@ -464,123 +719,123 @@ input:-moz-placeholder {
 
     <script>
     const localStorage = "enc";
-    const data = `    
-日期	英文	中文釋義	KK音標
-1	sausage	香腸;臘腸	['sɔsɪʤ]
-1	goat	山羊	[goʊt]
-1	spicy	辛辣的	['spaɪsi]
-1	pizza	披薩	['piʦə]
-1	ketchup	番茄醬	['kɛʧəp]
-2	pleasant	令人愉快的	['plɛzənt]
-2	side dish	配菜;小菜	[saɪd dɪʃ]
-2	fries	炸薯條	[fraɪz]
-2	pick up	購買	[pɪk ʌp]
-2	onion	洋蔥	['ʌnjən]
-3	large	大的	[lɑrʤ]
-3	marvelous	絕美的;好極的	['mɑrvələs]
-3	church	教堂	[ʧɝʧ]
-3	square	廣場	[skwɛr]
-3	move	(使)移動	[muv]
-4	festival	節慶;節日	['fɛstɪvəl]
-4	band	樂隊;樂團	[bænd]
-4	wall	牆	[wɔl]
-4	surround	圍繞	[sə'raʊnd]
-4	market	市集;市場	['mɑrkɪt]
-7	centimeter	公分	['sɛntəˌmitər]
-7	weight	重量	[weɪt]
-7	gram	公克	[græm]
-7	eagle	鷹	['igəl]
-7	goose	鵝	[gus]
-8	fence	欄杆;圍籬	[fɛns]
-8	focus	(使)聚焦	['foʊkəs]
-8	point	地點	[pɔɪnt]
-8	quickly	快速地	['kwɪkli]
-8	path	道路;通路	[pæθ]
-9	guy	人	[gaɪ]
-9	train	訓練	[treɪn]
-9	fit	健康的;健美的	[fɪt]
-9	test	考驗;測試	[tɛst]
-9	mind	心智	[maɪnd]
-10	sick	生病的	[sɪk]
-10	cook	烹煮;料理	[kʊk]
-10	wash	清洗	[wɑʃ]
-10	temperature	溫度	['tɛmpərəʧ]
-10	refrigerator	冰箱	[rɪ'frɪʤəˌreɪtər]
-11	pale	蒼白的(臉色或膚色)	[peɪl]
-11	buffet	自助餐廳;自助餐	[bə'feɪ]
-11	stomachache	胃痛;肚子痛	['stʌməkˌeɪk]
-11	lucky	幸運的	['lʌki]
-11	recover	恢復健康	[rɪ'kʌvər]
-14	hobby	嗜好	['hɑbi]
-14	star	星星	[stɑr]
-14	full	充滿的	[fʊl]
-14	billion	十億	['bɪljən]
-14	count	數算	[kaʊnt]
-15	borrow	借入	['bɑroʊ]
-15	interested	感興趣的	['ɪntrɪstɪd]
-15	tip	訣竅;撇步	[tɪp]
-15	cloudy	多雲的;陰天的	['klaʊdi]
-15	moon	月亮	[mun]
-16	die	過世,死亡	[daɪ]
-16	bag	袋子	[bæg]
-16	wrong	錯誤的	[rɔŋ]
-16	accept	接受	[æk'sɛpt]
-16	cafeteria	員工/學校餐廳	[ˌkæfɪ'tɪriə]
-17	creative	有創意的	[kriˈeɪtɪv]
-17	communicate	溝通；交流	[kəˈmjunɪkeɪt]
-17	cellphone	手機	[ˈsɛlfoʊn]
-17	light	光；光線	[laɪt]
-17	scientist	科學家	[ˈsaɪəntɪst]
-18	microwave	微波爐	[ˈmaɪkrəweɪv]
-18	heat up	加熱	[hit ʌp]
-18	seat belt	安全帶	[sit bɛlt]
-18	airplane	飛機	[ˈɛrpleɪn]
-18	medicine	醫學；醫術	[ˈmɛdəsɪn]
-21	clothes	衣服	[kloʊðz]
-21	fill	(使)裝滿	[fɪl]
-21	tight	緊地	[taɪt]
-21	steam	蒸氣	[stim]
-21	wrinkle	皺褶；皺紋	[ˈrɪŋkəl]
-22	sleepy	睏倦的；打瞌睡的	[ˈslipi]
-22	ice	冰；冰塊	[aɪs]
-22	quick	短暫的；快速的	[kwɪk]
-22	wake up	清醒、醒來	[ˈweɪk ʌp]
-22	energy	精力、能量	[ˈɛnɚʤi]
-23	habit	習慣	[ˈhæbɪt]
-23	meal	一餐飯	[mil]
-23	soda	汽水	[ˈsoʊdə]
-23	bedroom	臥室	[ˈbɛdrum]
-23	video	影片；錄影	[ˈvɪdioʊ]
-24	private	私人的；私有的	[ˈpraɪvɪt]
-24	own	自己的	[oʊn]
-24	cheap	便宜的；不貴的	[ʧip]
-24	individual	個人的；個體的	[ˌɪndəˈvɪʤuəl]
-24	slow	慢的	[sloʊ]
-25	flow	流動	[floʊ]
-25	roast	烘焙；烤	[roʊst]
-25	sort	挑選；分類	[sɔrt]
-25	perfect	完美的	[ˈpɜrfɪkt]
-25	affect	影響	[əˈfɛkt]
-28	meeting	會議；會面	[ˈmitɪŋ]
-28	enough	足夠的；充足的	[ɪˈnʌf]
-28	moment	片刻；時刻	[ˈmoʊmənt]
-28	past	過了；超過(時間)	[pæst]
-28	quarter	十五分鐘；一刻鐘	[ˈkwɔrtər]
-29	on time	準時	[ɑn taɪm]
-29	popcorn	爆米花	[ˈpɑpkɔrn]
-29	any time	不客氣	[ˈɛni taɪm]
-29	make time	騰出時間	[meɪk taɪm]
-29	now and then	偶爾	[naʊ ænd ðɛn]
-30	hen	母雞	[hɛn]
-30	farm	農場	[fɑrm]
-30	plant	種植	[plænt]
-30	golden	金色的	[ˈɡoldən]
-30	cut	剪、切	[kʌt]
-31	pile	(一)堆；疊	[paɪl]
-31	mix	(使)混合；拌合	[mɪks]
-31	pan	烤盤；平底鍋	[pæn]
-31	smell	氣味	[smɛl]
-31	nothing	沒有事情；沒有東西	[ˈnʌθɪŋ]
+    const data = `
+日期	英語	中文	KK音標	英語句子	中文句子
+1	sausage	香腸;臘腸	['sɔsɪʤ]	Do you want {sausage} for breakfast?	早餐想吃香腸嗎？
+1	goat	山羊	[goʊt]	The farmer has seven {goats}.	農夫有七隻山羊。
+1	spicy	辛辣的	['spaɪsi]	Can you eat {spicy} food?	可以吃辛辣的食物嗎？
+1	pizza	披薩	['piʦə]	What toppings do you want on the {pizza}?	您想在披薩上加什麼配料？
+1	ketchup	番茄醬	['kɛʧəp]	I want some {ketchup} on my hot dog.	我想在熱狗上加點番茄醬。
+2	pleasant	令人愉快的	['plɛzənt]	I had a {pleasant} time today.	我今天過得很愉快。
+2	side dish	配菜;小菜	[saɪd dɪʃ]	What {side dish} would you like?	您想要什麼配菜？
+2	fries	炸薯條	[fraɪz]	These {fries} have a nice crunch to them.	這些薯條有很好的嘎吱聲。
+2	pick up	購買	[pɪk ʌp]	Can you {pick up} some eggs at the store?	你能在商店買一些雞蛋嗎？
+2	onion	洋蔥	['ʌnjən]	He put {onions} on his sandwich.	他在三明治上放了洋蔥。
+3	large	大的	[lɑrʤ]	That dog is very {large}.	那隻狗很大。
+3	marvelous	絕美的;好極的	['mɑrvələs]	I saw some {marvelous} scenery in Korea.	我在韓國看到了一些奇妙的風景。
+3	church	教堂	[ʧɝʧ]	Everyone was quiet in the {church}.	教堂裡所有人都很安靜。
+3	square	廣場	[skwɛr]	Is there a {square} in the middle of town?	市中心有廣場嗎？
+3	move	(使)移動	[muv]	My little brother won't stop {moving}.	我的弟弟不會停止前進。
+4	festival	節慶;節日	['fɛstɪvəl]	Come to the music {festival} this weekend!	這個週末就來參加音樂祭吧！
+4	band	樂隊;樂團	[bænd]	Let's listen to the {band} play.	我們來聽聽樂團的演奏吧。
+4	wall	牆	[wɔl]	What's on the other side of the {wall}?	牆的另一邊是什麼？
+4	surround	圍繞	[sə'raʊnd]	Trees and plants {surround} the lake.	樹木和植物環繞著湖泊。
+4	market	市集;市場	['mɑrkɪt]	What did you buy at the {market}?	你在市場上買了什麼？
+7	centimeter	公分	['sɛntəˌmitər]	The ruler is 15 {centimeters} long.	尺子長15公分。
+7	weight	重量	[weɪt]	What's the {weight} of your dog?	你的狗的體重是多少？
+7	gram	公克	[græm]	How many {grams} of sugar do you need?	您需要多少克糖？
+7	eagle	鷹	['igəl]	I see an {eagle} in the sky.	我看到天空中有一隻鷹。
+7	goose	鵝	[gus]	A {goose} is swimming in the lake.	一隻鵝正在湖裡游泳。
+8	fence	欄杆;圍籬	[fɛns]	It's right around the {fence}.	就在柵欄周圍。
+8	focus	(使)聚焦	['foʊkəs]	Let's {focus} on the problem.	讓我們重點關注這個問題。
+8	point	地點	[pɔɪnt]	At which {point} do you want to meet?	您想在什麼時候見面？
+8	quickly	快速地	['kwɪkli]	Don moved {quickly} through the park.	唐快速穿過公園。
+8	path	道路;通路	[pæθ]	Just stay on the {path}.	就留在路上吧。
+9	guy	人	[gaɪ]	Which {guy} did you talk to?	你和哪個傢伙說話了？
+9	train	訓練	[treɪn]	He's {training} to run in a race.	他正在訓練參加比賽。
+9	fit	健康的;健美的	[fɪt]	Joan is very strong and {fit}.	瓊非常強壯、健康。
+9	test	考驗;測試	[tɛst]	Is the boy honest? Let's {test} it out.	這孩子誠實嗎？我們來測試一下。
+9	mind	心智	[maɪnd]	Sophie's on my {mind}.	蘇菲在我的腦海裡。
+10	sick	生病的	[sɪk]	Paul isn't here today. He's {sick}.	保羅今天沒來。他病了。
+10	cook	烹煮;料理	[kʊk]	How will you {cook} the vegetables?	你會怎麼煮蔬菜？
+10	wash	清洗	[wɑʃ]	I need to {wash} my hands.	我需要洗手。
+10	temperature	溫度	['tɛmpərəʧ]	What's the {temperature} outside?	外面的溫度是多少？
+10	refrigerator	冰箱	[rɪ'frɪʤəˌreɪtər]	Put the milk back in the {refrigerator}.	將牛奶放回冰箱。
+11	pale	蒼白的(臉色或膚色)	[peɪl]	Jen's face is very {pale} today.	珍今天的臉色很蒼白。
+11	buffet	自助餐廳;自助餐	[bə'feɪ]	We enjoyed a delicious breakfast {buffet}.	我們享用了美味的自助早餐。
+11	stomachache	胃痛;肚子痛	['stʌməkˌeɪk]	Eating too much gives me a {stomachache}.	吃太多讓我胃痛。
+11	lucky	幸運的	['lʌki]	We're {lucky} that it didn't rain today.	我們很幸運今天沒有下雨。
+11	recover	恢復健康	[rɪ'kʌvər]	Wendy was sick, but she {recovered}.	溫迪生病了，但她康復了。
+14	hobby	嗜好	['hɑbi]	My favorite {hobby} is drawing.	我最喜歡的嗜好是畫畫。
+14	star	星星	[stɑr]	Look at the {stars} in the sky!	看看天上的星星！
+14	full	充滿的	[fʊl]	This room is {full} of people.	這個房間裡擠滿了人。
+14	billion	十億	['bɪljən]	{Billions} of people live on Earth.	數十億人生活在地球上。
+14	count	數算	[kaʊnt]	Please {count} the chairs.	請數一下椅子。
+15	borrow	借入	['bɑroʊ]	May I {borrow} this book?	可以藉這本書嗎？
+15	interested	感興趣的	['ɪntrɪstɪd]	Are you {interested} in traveling?	你有興趣旅行嗎？
+15	tip	訣竅;撇步	[tɪp]	Those are great {tips}!	這些都是很棒的建議！
+15	cloudy	多雲的;陰天的	['klaʊdi]	Will the weather be {cloudy} tomorrow?	明天天氣多雲嗎？
+15	moon	月亮	[mun]	Why can't I see the {moon}?	為什麼我看不到月亮？
+16	die	過世,死亡	[daɪ]	Their pet dog {died} last month.	他們的寵物狗上個月死了。
+16	bag	袋子	[bæg]	What's in that {bag}?	那個袋子裡面有什麼？
+16	wrong	錯誤的	[rɔŋ]	You have the {wrong} idea.	你的想法是錯的。
+16	accept	接受	[æk'sɛpt]	I can't {accept} any money.	我不能接受任何金錢。
+16	cafeteria	員工/學校餐廳	[ˌkæfɪ'tɪriə]	The boys are eating in the {cafeteria}.	男孩們正在食堂吃飯。
+17	creative	有創意的	[kriˈeɪtɪv]	Maria is very {creative}.	瑪麗亞很有創意。
+17	communicate	溝通；交流	[kəˈmjunɪkeɪt]	Ben {communicates} with his family often.	本經常與家人溝通。
+17	cellphone	手機	[ˈsɛlfoʊn]	I'll call him on my {cellphone}.	我會用手機打給他。
+17	light	光；光線	[laɪt]	I need more {light} so I can read.	我需要更多的光線才能閱讀。
+17	scientist	科學家	[ˈsaɪəntɪst]	The {scientist} discovered something!	科學家發現了什麼！
+18	microwave	微波爐	[ˈmaɪkrəweɪv]	I use the {microwave} to cook fish.	我用微波爐煮魚。
+18	heat up	加熱	[hit ʌp]	I want to {heat up} this food.	我想把這食物加熱一下。
+18	seat belt	安全帶	[sit bɛlt]	Wear your {seat belt} in the car.	在車內繫好安全帶。
+18	airplane	飛機	[ˈɛrpleɪn]	Do you like to fly in {airplanes}?	你喜歡搭飛機嗎？
+18	medicine	醫學；醫術	[ˈmɛdəsɪn]	Justin is studying {medicine}.	賈斯汀正在學習醫學。
+21	clothes	衣服	[kloʊðz]	Those {clothes} are very expensive.	那些衣服很貴。
+21	fill	(使)裝滿	[fɪl]	{Fill} all the cups with milk.	將所有杯子裝滿牛奶。
+21	tight	緊地	[taɪt]	Pull the blanket {tight}.	把毯子拉緊。
+21	steam	蒸氣	[stim]	The {steam} is very hot.	蒸汽很熱。
+21	wrinkle	皺褶；皺紋	[ˈrɪŋkəl]	There are {wrinkles} in your shirt.	你的襯衫上有皺紋。
+22	sleepy	睏倦的；打瞌睡的	[ˈslipi]	I'm {sleepy}. I can't keep my eyes open.	我想睡覺。我睜不開眼睛。
+22	ice	冰；冰塊	[aɪs]	I want {ice} in my water.	我想在水裡加冰。
+22	quick	短暫的；快速的	[kwɪk]	Let's eat a {quick} lunch and then study.	我們先吃頓午飯，然後再學習。
+22	wake up	清醒、醒來	[ˈweɪk ʌp]	What time do you {wake up} in the morning?	你早上幾點起床？
+22	energy	精力、能量	[ˈɛnɚʤi]	Her little brother has a lot of {energy}.	她的弟弟精力充沛。
+23	habit	習慣	[ˈhæbɪt]	Smoking is a very bad {habit}.	吸煙是一個非常不好的習慣。
+23	meal	一餐飯	[mil]	Most people eat three {meals} a day.	多數人一日三餐。
+23	soda	汽水	[ˈsoʊdə]	I want a large {soda} with my pizza.	我想要一大杯蘇打水配披薩。
+23	bedroom	臥室	[ˈbɛdrum]	He likes to study in his {bedroom}.	他喜歡在臥室裡學習。
+23	video	影片；錄影	[ˈvɪdioʊ]	What kind of {videos} do you watch?	你看什麼類型的影片？
+24	private	私人的；私有的	[ˈpraɪvɪt]	This is {private} information.	這是私人資訊。
+24	own	自己的	[oʊn]	Having your {own} car is convenient.	有自己的車很方便。
+24	cheap	便宜的；不貴的	[ʧip]	This shirt was {cheap}. It was only $10.	這件襯衫很便宜。才 10 美元。
+24	individual	個人的；個體的	[ˌɪndəˈvɪʤuəl]	I talked to each {individual} student.	我與每個學生進行了交談。
+24	slow	慢的	[sloʊ]	This bus is really {slow}.	這輛公車真的很慢。
+25	flow	流動	[floʊ]	I can hear water {flowing}.	我聽到水流的聲音。
+25	roast	烘焙；烤	[roʊst]	Let's {roast} this corn.	我們來烤一下這個玉米吧。
+25	sort	挑選；分類	[sɔrt]	Please {sort} the paper by color.	請依顏色對紙張進行分類。
+25	perfect	完美的	[ˈpɜrfɪkt]	Ed never makes mistakes. He's {perfect}.	艾德從不犯錯。他很完美。
+25	affect	影響	[əˈfɛkt]	Bright light {affects} his sleep.	明亮的光線影響他的睡眠。
+28	meeting	會議；會面	[ˈmitɪŋ]	When is your {meeting} with the boss?	你什麼時候跟老闆見面？
+28	enough	足夠的；充足的	[ɪˈnʌf]	Do you have {enough} time?	你有足夠的時間嗎？
+28	moment	片刻；時刻	[ˈmoʊmənt]	Please wait a {moment}.	請稍等。
+28	past	過了；超過(時間)	[pæst]	It's eight minutes {past} 9:00.	現在是 9:00 過八分鐘。
+28	quarter	十五分鐘；一刻鐘	[ˈkwɔrtər]	I can meet you in a {quarter} of an hour.	一刻鐘後我就能見到你。
+29	on time	準時	[ɑn taɪm]	Please be {on time} for work.	請準時上班。
+29	popcorn	爆米花	[ˈpɑpkɔrn]	Nancy likes to eat {popcorn}.	南希喜歡吃爆米花。
+29	any time	不客氣	[ˈɛni taɪm]	Thanks for helping me. {Any time}!	謝謝你幫我。任何時間！
+29	make time	騰出時間	[meɪk taɪm]	Please {make time} to see her.	請抽出時間來見見她。
+29	now and then	偶爾	[naʊ ænd ðɛn]	She only eats candy {now and then}.	她只是偶爾吃點糖果。
+30	hen	母雞	[hɛn]	Do you get many eggs from your {hens}?	你從你的母雞那裡得到很多雞蛋嗎？
+30	farm	農場	[fɑrm]	What animals live on your {farm}?	您的農場裡生活著哪些動物？
+30	plant	種植	[plænt]	Help me {plant} these flowers.	幫我種這些花。
+30	golden	金色的	[ˈɡoldən]	The sun is a beautiful {golden} color.	太陽是美麗的金色。
+30	cut	剪、切	[kʌt]	She {cut} some flowers in the garden.	她在花園裡剪了一些花。
+31	pile	(一)堆；疊	[paɪl]	Is that your {pile} of clothes?	那是你的一堆衣服嗎？
+31	mix	(使)混合；拌合	[mɪks]	{Mix} the flour and water together.	將麵粉和水混合在一起。
+31	pan	烤盤；平底鍋	[pæn]	Put some water in this {pan}.	在這個鍋子裡放一些水。
+31	smell	氣味	[smɛl]	What is that terrible {smell}?	那股可怕的味道是什麼？
+31	nothing	沒有事情；沒有東西	[ˈnʌθɪŋ]	{Nothing} was left after dinner.	晚餐後什麼也沒有剩下。
 `;
 
 
@@ -750,16 +1005,20 @@ function parseData() {
     // 檢查標題並決定可用的配對選項
     const hasKK = headers.includes('KK音標');
     const hasDate = headers.includes('日期');
+	const hasEnglishSentence = headers.includes('英語句子');
     
     // 生成配對選項按鈕
     const setupDiv = document.getElementById('setup');
     const pairButtons = setupDiv.querySelector('h2:first-of-type').nextElementSibling;
     pairButtons.innerHTML = '<button id="en-ch" class="pair-button selected" onclick="selectPair(\'english\', \'chinese\')">英語 - 中文</button>';
-    
     if (hasKK) {
         pairButtons.innerHTML += '<button id="en-kk" class="pair-button" onclick="selectPair(\'english\', \'kk\')">英語 - KK音標</button>';
         pairButtons.innerHTML += '<button id="kk-ch" class="pair-button" onclick="selectPair(\'kk\', \'chinese\')">KK音標 - 中文</button>';
     }
+    if (hasEnglishSentence) {
+        pairButtons.innerHTML += '<button id="en-sen-ch-sen" class="pair-button" onclick="selectPair(\'englishSentence\', \'chineseSentence\')">英語句子 - 中文句子</button>';
+    }
+    
     
     // 處理日期範圍選擇
     const rangeSelect = document.getElementById('range-select');
@@ -768,10 +1027,10 @@ function parseData() {
     let currentDate = '';  // 用於存儲當前日期
 
     // 解析數據
+  
     lines.slice(1).forEach(line => {
         const parts = line.split('\t');
         const wordObj = {};
-        
         headers.forEach((header, index) => {
             if (header === '日期' || header === '分類') {
                 if (parts[index].trim() !== '') {
@@ -787,10 +1046,13 @@ function parseData() {
                 wordObj.kk = parts[index];
             } else if (header === '中文釋義' || header === '中文' || header === 'Chinese' || header === 'chinese' || header === '華語' ) {
                 wordObj.chinese = parts[index];
+            } else if (header === '英語句子' || header === 'English Sentence') {
+                wordObj.englishSentence = parts[index];
+            } else if (header === '中文句子' || header === 'Chinese Sentence') {
+                wordObj.chineseSentence = parts[index];
             }
         });
-        
-        if (wordObj.english && wordObj.chinese) {  // 確保至少有英文和中文才添加到單詞列表
+        if (wordObj.english && wordObj.chinese && wordObj.englishSentence && wordObj.chineseSentence) {
             words.push(wordObj);
         }
     });
@@ -843,11 +1105,21 @@ window.onload = parseData;
         });
     }
 
-    function selectPair(first, second) {
-        selectedPair = [first, second];
-        document.querySelectorAll('.pair-button').forEach(btn => btn.classList.remove('selected'));
-        document.getElementById(`${first.slice(0,2)}-${second.slice(0,2)}`).classList.add('selected');
+function selectPair(first, second) {
+    selectedPair = [first, second];
+    document.querySelectorAll('.pair-button').forEach(btn => btn.classList.remove('selected'));
+    let buttonId;
+    if (first === 'englishSentence' && second === 'chineseSentence') {
+        buttonId = 'en-sen-ch-sen';
+    } else {
+        buttonId = `${first.slice(0,2)}-${second.slice(0,2)}`;
     }
+    const selectedButton = document.getElementById(buttonId);
+    if (selectedButton) {
+        selectedButton.classList.add('selected');
+    }
+}
+
 
     function updateSelectedRange() {
         selectedRange = document.getElementById('range-select').value;
@@ -874,8 +1146,13 @@ function startGame() {
     }
     
     currentPairs = shuffleArray(availableWords).slice(0, 6);
-    currentPairs.forEach(word => usedWords.add(word.english));
-    
+    currentPairs.forEach(word => {
+        usedWords.add(word.english);
+        // 如果選擇了句子配對，也將句子加入已使用列表
+        if (selectedPair[0] === 'englishSentence' || selectedPair[1] === 'chineseSentence') {
+            usedWords.add(word.englishSentence);
+        }
+    });
     renderBoard();
 }
 
@@ -906,16 +1183,42 @@ function startSpellingGame() {
 function renderSpellingGame() {
     const gameBoard = document.getElementById('game-board');
     gameBoard.innerHTML = '';
-
     if (spellingRound <= 5) {
         const currentSpellingWord = spellingWords[spellingRound - 1];
+        
+        // 原有的詞語顯示
         const wordDisplay = document.createElement('div');
         wordDisplay.className = 'word-display';
         wordDisplay.innerHTML = selectedPair[1] === 'chinese' ? currentSpellingWord.chinese : colorizeKKPhonetic(currentSpellingWord.kk);
+        gameBoard.appendChild(wordDisplay);
 
+        // 新增: 顯示中文句子
+        if (currentSpellingWord.chineseSentence) {
+            const chineseSentenceDisplay = document.createElement('div');
+            chineseSentenceDisplay.className = 'sentence-display';
+            chineseSentenceDisplay.textContent = currentSpellingWord.chineseSentence;
+            gameBoard.appendChild(chineseSentenceDisplay);
+        }
+
+        // 新增: 顯示英語句子，將目標詞替換為下劃線
+        if (currentSpellingWord.englishSentence) {
+            const englishSentenceDisplay = document.createElement('div');
+            englishSentenceDisplay.className = 'sentence-display';
+            const replacedEnglishSentence = currentSpellingWord.englishSentence.replace(
+                new RegExp(`\\b${currentSpellingWord.english}\\b`, 'gi'),
+                '_'.repeat(currentSpellingWord.english.length)
+            );
+            englishSentenceDisplay.textContent = replacedEnglishSentence;
+            gameBoard.appendChild(englishSentenceDisplay);
+            // 朗讀完整的英語句子
+            setTimeout(() => {
+                speakWord(currentSpellingWord.englishSentence);
+            }, 500); // 延遲半秒鐘再朗讀，確保頁面已經渲染完成
+        }
+
+        // 原有的輸入框
         const input = document.createElement('input');
         input.type = 'text';
-        
         // 創建佔位符文字
         const answerWord = currentSpellingWord.english;
         const placeholderText = answerWord.split('').map((char, index) => {
@@ -924,16 +1227,11 @@ function renderSpellingGame() {
             if (char === '-') return '-';
             return '*';
         }).join('');
-
         input.placeholder = placeholderText;
-
         input.addEventListener('keyup', (e) => checkSpellingAnswer(e, currentSpellingWord));
         input.onfocus = () => input.select();
-
-        gameBoard.appendChild(wordDisplay);
         gameBoard.appendChild(input);
         input.focus();
-
         spellingRound++;
     } else {
         showSpellingResults();
@@ -1074,29 +1372,36 @@ function updateStats() {
 		}).join('');
 	}
 
-    function renderBoard() {
-        const gameBoard = document.getElementById('game-board');
-        gameBoard.innerHTML = '';
-        
-        const allCards = [...currentPairs.map(word => ({ word, type: selectedPair[0] })), 
-                          ...currentPairs.map(word => ({ word, type: selectedPair[1] }))];
-        const shuffledCards = shuffleArray(allCards);
-        
-        shuffledCards.forEach((card, index) => {
-            const cardElement = document.createElement('div');
-            cardElement.className = 'card';
-            if (card.type === 'english') {
-                cardElement.innerHTML = colorizeEnglishWord(card.word[card.type]);
-            } else if (card.type === 'kk' && selectedPair.includes('kk') && selectedPair.includes('chinese')) {
-                cardElement.innerHTML = colorizeKKPhonetic(card.word[card.type]);
-            } else {
-                cardElement.textContent = card.word[card.type];
+function renderBoard() {
+    const gameBoard = document.getElementById('game-board');
+    gameBoard.innerHTML = '';
+    const allCards = [...currentPairs.map(word => ({ word, type: selectedPair[0] })), 
+                      ...currentPairs.map(word => ({ word, type: selectedPair[1] }))];
+    const shuffledCards = shuffleArray(allCards);
+    shuffledCards.forEach((card, index) => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'card';
+        if (card.type === 'english') {
+            cardElement.innerHTML = colorizeEnglishWord(card.word[card.type]);
+        } else if (card.type === 'kk' && selectedPair.includes('kk') && selectedPair.includes('chinese')) {
+            cardElement.innerHTML = colorizeKKPhonetic(card.word[card.type]);
+        } else if (card.type === 'englishSentence' || card.type === 'chineseSentence') {
+			// 處理英語句子和中文句子
+            cardElement.textContent = card.word[card.type];
+        } else {
+            cardElement.textContent = card.word[card.type];
+        }
+        cardElement.dataset.index = index;
+        cardElement.onclick = () => {
+            flipCard(cardElement, card);
+            // 當點擊英語句子卡片時播放音頻
+            if (card.type === 'englishSentence') {
+                speakWord(card.word.englishSentence);
             }
-            cardElement.dataset.index = index;
-            cardElement.onclick = () => flipCard(cardElement, card);
-            gameBoard.appendChild(cardElement);
-        });
-    }
+        };
+        gameBoard.appendChild(cardElement);
+    });
+}
 
     function flipCard(cardElement, card) {
         if (flippedCards.length < 2 && !flippedCards.some(fc => fc.element === cardElement) && !cardElement.classList.contains('matched')) {
@@ -1112,17 +1417,21 @@ function updateStats() {
             }
         }
     }
-
-
     function checkMatch() {
         const [card1, card2] = flippedCards;
         attempts++;
         if (card1.card.word === card2.card.word && card1.card.type !== card2.card.type) {
             card1.element.classList.add('matched', 'jump');
             card2.element.classList.add('matched', 'jump');
+
+        if (selectedPair[0] === 'englishSentence' && selectedPair[1] === 'chineseSentence') {
+            speakWord(card1.card.word.englishSentence);
+        } else {
             speakWord(card1.card.word.english);
-            rightSound.play();
-            correctMatches++;
+        }
+        
+        rightSound.play();
+        correctMatches++;
 
             // 移除跳動動畫類別
             setTimeout(() => {
@@ -1215,41 +1524,81 @@ function showWordList() {
     headers.forEach(header => {
         const th = document.createElement('th');
         th.textContent = header;
+        th.dataset.header = header;
         headerRow.appendChild(th);
     });
 
-    let wordsToShow = selectedRange === 'all' ? words : getAvailableWords(selectedRange);
+    // 控制列
+    let checkboxContainer = document.getElementById('column-checkboxes');
+    if (!checkboxContainer) {
+        checkboxContainer = document.createElement('div');
+        checkboxContainer.id = 'column-checkboxes';
+        checkboxContainer.style.marginBottom = '10px';
+        headers.forEach((header, index) => {
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `checkbox-${header}`;
+            checkbox.checked = true;
+            checkbox.onchange = () => updateTableVisibility();
+            const label = document.createElement('label');
+            label.htmlFor = `checkbox-${header}`;
+            label.textContent = header;
+            checkboxContainer.appendChild(checkbox);
+            checkboxContainer.appendChild(label);
+        });
+        // 將控制列插入到表格之前，標題之後
+        modal.querySelector('.modal-content').insertBefore(checkboxContainer, document.getElementById('word-list-table'));
+    }
 
+    let wordsToShow = selectedRange === 'all' ? words : getAvailableWords(selectedRange);
     wordsToShow.forEach(word => {
         const row = tableBody.insertRow();
-        
         headers.forEach(header => {
             const cell = row.insertCell();
+            cell.dataset.header = header;
             let content = '';
-
             // 根據不同的可能的標題名稱來獲取內容
             if (header === '日期' || header === '分類') content = word.date;
             else if (header === '英文' || header === 'English' || header === 'ENGLISH' || header === '英語') content = word.english;
             else if (header === 'KK音標' || header === 'KK' || header === 'KK 音標') content = word.kk;
             else if (header === '中文釋義' || header === '中文' || header === 'Chinese' || header === 'chinese' || header === '華語') content = word.chinese;
-            else if (header === '詞性') content = word.partOfSpeech; // 假設詞性存儲在 partOfSpeech 屬性中
+            else if (header === '英語句子' || header === 'English Sentence') content = word.englishSentence;
+            else if (header === '中文句子' || header === 'Chinese Sentence') content = word.chineseSentence;
             else content = word[header.toLowerCase()] || ''; // for any other headers
 
-            if (header === '英文' || header === 'English' || header === 'ENGLISH' || header === '英語') {
-                cell.innerHTML = colorizeEnglishWord(content);
-                cell.className = 'clickable';
-                cell.onclick = () => speakWord(content);
-            } else if (header === 'KK音標' || header === 'KK' || header === 'KK 音標') {
-                cell.innerHTML = colorizeKKPhonetic(content);
-                cell.className = 'clickable';
-                cell.onclick = () => speakWord(word.english);
+			  if (header === '英文' || header === 'English' || header === 'ENGLISH' || header === '英語') {
+				cell.innerHTML = colorizeEnglishWord(content);
+				cell.className = 'clickable';
+				cell.onclick = () => speakWord(content);
+			  } else if (header === 'KK音標' || header === 'KK' || header === 'KK 音標') {
+				cell.innerHTML = colorizeKKPhonetic(content);
+				cell.className = 'clickable';
+				cell.onclick = () => speakWord(word.english);
+			  } else if (header === '英語句子' || header === 'English Sentence') {
+				cell.textContent = content;
+				cell.className = 'clickable';
+				cell.onclick = () => speakWord(content);
             } else {
                 cell.textContent = content;
             }
         });
     });
 
+    updateTableVisibility();
     modal.style.display = 'block';
+}
+
+function updateTableVisibility() {
+    const headers = document.querySelectorAll('#word-list-table th');
+    const rows = document.querySelectorAll('#word-list-table tbody tr');
+
+    headers.forEach((header, index) => {
+        const isChecked = document.getElementById(`checkbox-${header.dataset.header}`).checked;
+        header.style.display = isChecked ? '' : 'none';
+        rows.forEach(row => {
+            row.cells[index].style.display = isChecked ? '' : 'none';
+        });
+    });
 }
 
 function closeWordList() {
@@ -1277,6 +1626,464 @@ function updateSelectedRange() {
 	parseData();
 	populateDateDropdown();
 	document.getElementById('show-custom-wordlist-btn').onclick = showCustomWordlist;
+
+
+
+
+
+
+
+
+let currentGameSentences = [];
+let currentSentenceIndex = 0;
+let currentWords = [];
+let correctAnswers = 0;
+let lastCheckedAnswer = '';
+let canCheck = true;
+let gameWordAudio = null;
+let isMuted = false;
+
+function startSentenceGame() {
+    // 獲取當前配對模式
+    const pairButtons = document.querySelectorAll('.pair-button');
+    const selectedPairButton = Array.from(pairButtons).find(btn => btn.classList.contains('selected'));
+    const selectedPairId = selectedPairButton.id;
+    
+    // 隱藏設置界面，顯示遊戲界面
+    document.getElementById('setup').style.display = 'none';
+    const gameContainer = document.getElementById('gameContainer');
+    gameContainer.style.display = 'block';
+	const gameContent = document.querySelector('.game-content');
+	gameContent.style.display = 'block';
+    
+    // 根據選擇的配對模式準備題目
+    currentGameSentences = [];
+    let availableWords = getAvailableWords(selectedRange);
+    
+    availableWords.forEach(word => {
+        let question, answer;
+        switch(selectedPairId) {
+            case 'en-ch':
+                question = word.chinese;
+                answer = word.english;
+                break;
+            case 'en-kk':
+                question = word.kk;
+                answer = word.english;
+                break;
+            case 'kk-ch':
+                question = word.chinese;
+                answer = word.kk;
+                break;
+            case 'en-sen-ch-sen':
+                question = word.chineseSentence;
+                answer = word.englishSentence;
+                break;
+        }
+        
+        currentGameSentences.push({
+            primary: answer,
+            secondary: question
+        });
+    });
+    
+    // 打亂題目順序
+    shuffleArray2(currentGameSentences);
+    
+    // 開始第一題
+    currentSentenceIndex = 0;
+    correctAnswers = 0;
+    loadNextSentence();
+}
+
+
+
+
+function shuffleArray2(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+
+
+function playAudioMp3(filename) {
+  const audio = new Audio(filename);
+  audio.play();
+}
+
+
+function nextQuestion() {
+  currentSentenceIndex++;
+  loadNextSentence();
+}
+
+function nextQuestion2() {
+	document.getElementById('gameResult').style.display = 'none';	
+	document.getElementById('gameContent').style.display = 'block';	
+	document.getElementById('gameContainer').style.display = 'block';	
+  currentSentenceIndex++;
+  loadNextSentence();
+}
+
+function closeGame() {
+    document.getElementById('gameContainer').style.display = 'none';
+	document.getElementById('gameResult').style.display = 'none';	
+	//document.getElementById('controls').style.display = 'block';
+	//document.getElementById('content').style.display = 'block';
+	document.getElementById('setup').style.display = 'block';
+
+    currentSentenceIndex = 0;
+    correctAnswers = 0;
+    if (gameWordAudio) {
+        gameWordAudio.pause();
+        gameWordAudio = null;
+    }
+}
+
+
+
+
+function updateProgressBar() {
+  const progressBarFill = document.querySelector('.progress-bar-fill');
+  const progressText = document.querySelector('.progress-text');
+  const progress = ((currentSentenceIndex + 1) / currentGameSentences.length) * 100;
+  
+  progressBarFill.style.width = `${progress}%`;
+  progressText.textContent = `${currentSentenceIndex + 1} / ${currentGameSentences.length}`;
+}
+
+function showGameResult() {
+  const gameContent = document.querySelector('.game-content');
+  const gameResult = document.getElementById('gameResult');
+  const accuracyRate = document.getElementById('accuracyRate');
+  
+  gameContent.style.display = 'none';
+  gameResult.style.display = 'block';  
+  
+  const accuracy = (correctAnswers / currentGameSentences.length) * 100;
+  accuracyRate.textContent = `${accuracy.toFixed(1)}%`;
+}
+
+function endGame() {
+  //showGameResult();
+  closeGame();
+}
+
+
+function restartGame() {
+    const gameContent = document.querySelector('.game-content');
+    const gameResult = document.getElementById('gameResult');
+    gameContent.style.display = 'block';
+    gameResult.style.display = 'none';
+	document.getElementById('gameResult').style.display = 'none';
+    if (gameWordAudio) {
+        gameWordAudio.pause();
+        gameWordAudio = null;
+    }
+    startSentenceGame();
+}
+
+
+function loadNextSentence() {
+  if (currentSentenceIndex >= currentGameSentences.length) {
+    showGameResult();
+    return;
+  }
+  
+  const sentence = currentGameSentences[currentSentenceIndex];
+  document.getElementById('gameQuestion').textContent = sentence.secondary;
+  currentWords = sentence.primary.split(' ');
+  shuffleArray(currentWords);
+  
+  const wordBank = document.getElementById('wordBank');
+  const answerArea = document.getElementById('answerArea');
+  wordBank.innerHTML = '';
+  answerArea.innerHTML = '';
+  
+  currentWords.forEach((word, index) => {
+    const wordTile = createWordTile(word, index);
+    wordBank.appendChild(wordTile);
+  });
+  
+  document.getElementById('checkButton').style.display = 'inline-block';
+  document.getElementById('nextButton').style.display = 'none';
+  document.getElementById('nextButton2').style.display = 'none';
+  document.getElementById('endGameButton').style.display = 'none';
+  lastCheckedAnswer = '';
+  canCheck = true;
+  updateCheckButtonState();
+  updateProgressBar();
+  
+  setTimeout(() => {
+    playGameAudio();
+  }, 500);
+}
+
+
+// 修改 createWordTile 函數,配合主程式的音訊播放邏輯
+function createWordTile(word, index) {
+    const tile = document.createElement('div');
+    tile.className = 'word-tile';
+    tile.textContent = word;
+    tile.dataset.index = index;
+
+    // 獲取當前的配對模式
+    const pairButtons = document.querySelectorAll('.pair-button');
+    const selectedPairButton = Array.from(pairButtons).find(btn => btn.classList.contains('selected'));
+    const selectedPairId = selectedPairButton.id;
+    
+    // 設置點擊事件
+    tile.onclick = function() {
+        moveWord(this);
+        // 根據配對模式決定播放的語言
+        let audioLang;
+        switch(selectedPairId) {
+            case 'en-ch':
+            case 'en-kk':
+                audioLang = 'english';
+                break;
+            case 'kk-ch':
+                // KK音標模式下播放英文音檔
+                audioLang = 'english';
+                // 找到對應的英文單字
+                const currentWord = words.find(w => w.kk === word);
+                if (currentWord) {
+                    word = currentWord.english;
+                }
+                break;
+            case 'en-sen-ch-sen':
+                audioLang = 'english';
+                break;
+        }
+        
+        // 調用主程式的發音功能
+        if (word && audioLang) {
+            speakWord(word);
+        }
+    };
+    
+    return tile;
+}
+
+// 修改 playGameAudio 函數,配合主程式的音訊播放邏輯
+function playGameAudio() {
+    if (isMuted) return;
+
+    // 獲取當前的配對模式
+    const pairButtons = document.querySelectorAll('.pair-button');
+    const selectedPairButton = Array.from(pairButtons).find(btn => btn.classList.contains('selected'));
+    const selectedPairId = selectedPairButton.id;
+
+    // 獲取當前題目的答案
+    const currentSentence = currentGameSentences[currentSentenceIndex];
+    let textToSpeak = currentSentence.primary; // 預設播放答案
+
+    // 如果是 KK 音標模式,需要找到對應的英文單字
+    if (selectedPairId === 'kk-ch') {
+        const currentWord = words.find(w => w.kk === textToSpeak);
+        if (currentWord) {
+            textToSpeak = currentWord.english;
+        }
+    }
+
+    // 使用主程式的發音功能
+    if (textToSpeak) {
+        // 清除之前的音訊
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+        }
+        speakWord(textToSpeak);
+    }
+}
+
+function playGameAudioWordBank(text) {
+    if (isMuted) return;
+
+    // 獲取當前的配對模式
+    const pairButtons = document.querySelectorAll('.pair-button');
+    const selectedPairButton = Array.from(pairButtons).find(btn => btn.classList.contains('selected'));
+    const selectedPairId = selectedPairButton.id;
+
+    // 獲取當前題目的答案
+    const currentSentence = currentGameSentences[currentSentenceIndex];
+    let textToSpeak = text; // 預設播放答案
+
+    // 如果是 KK 音標模式,需要找到對應的英文單字
+    if (selectedPairId === 'kk-ch') {
+        const currentWord = words.find(w => w.kk === textToSpeak);
+        if (currentWord) {
+            textToSpeak = currentWord.english;
+        }
+    }
+
+    // 使用主程式的發音功能
+    if (textToSpeak) {
+        // 清除之前的音訊
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+        }
+        speakWord(textToSpeak);
+    }
+}
+
+// 輔助函數: 移動單詞磚塊
+function moveWord(tile) {
+    const answerArea = document.getElementById('answerArea');
+    const wordBank = document.getElementById('wordBank');
+
+    if (tile.parentNode === wordBank) {
+        // 將磚塊移動到答案區域
+        const clonedTile = tile.cloneNode(true);
+        clonedTile.onclick = function() { moveWord(this); };
+        answerArea.appendChild(clonedTile);
+        tile.style.opacity = '0.5';
+        tile.style.backgroundColor = '#f0f0f0';
+        tile.onclick = null;
+    } else if (tile.parentNode === answerArea) {
+        // 將磚塊移回單詞庫
+        tile.remove();
+        const originalTile = wordBank.querySelector(`[data-index="${tile.dataset.index}"]`);
+        if (originalTile) {
+            originalTile.style.opacity = '1';
+            originalTile.style.backgroundColor = '#fff';
+            originalTile.onclick = function() { 
+                moveWord(this);
+                speakWord(this.textContent); // 播放單個單詞的音檔
+            };
+        }
+    }
+
+    updateCheckButtonState();
+}
+
+// 更新檢查按鈕狀態
+function updateCheckButtonState() {
+    const answerArea = document.getElementById('answerArea');
+    const currentAnswer = Array.from(answerArea.children)
+                              .map(tile => tile.textContent)
+                              .join(' ');
+    const checkButton = document.getElementById('checkButton');
+    
+    if (currentAnswer !== lastCheckedAnswer && currentAnswer.trim() !== '') {
+        checkButton.disabled = false;
+        checkButton.style.opacity = '1';
+    } else {
+        checkButton.disabled = true;
+        checkButton.style.opacity = '0.5';
+    }
+}
+
+
+
+function toggleMute() {
+    isMuted = !isMuted;
+    const muteButton = document.getElementById('muteButton');
+    muteButton.textContent = isMuted ? '🔇' : '🔊';
+    
+    // 如果正在播放音頻，根據靜音狀態暫停或繼續播放
+    if (gameWordAudio) {
+        if (isMuted) {
+            gameWordAudio.pause();
+        } else {
+            gameWordAudio.play();
+        }
+    }
+}
+
+
+
+function moveWord(tile) {
+    const answerArea = document.getElementById('answerArea');
+    const wordBank = document.getElementById('wordBank');
+
+    if (tile.parentNode === wordBank) {
+        // 將磚塊移動到答案區域
+        const clonedTile = tile.cloneNode(true);
+        clonedTile.onclick = function() { moveWord(this); };
+        answerArea.appendChild(clonedTile);
+        tile.style.opacity = '0.5';
+        tile.style.backgroundColor = '#f0f0f0';
+        tile.onclick = null;
+    } else if (tile.parentNode === answerArea) {
+        // 將磚塊移回單詞庫
+        tile.remove();
+        const originalTile = wordBank.querySelector(`[data-index="${tile.dataset.index}"]`);
+        if (originalTile) {
+            originalTile.style.opacity = '1';
+            originalTile.style.backgroundColor = '#fff';
+            originalTile.onclick = function() { 
+                moveWord(this);
+                playGameAudioWordBank(this.textContent); // 使用現有的音訊播放函數
+            };
+        }
+    }
+
+    updateCheckButtonState();
+}
+
+
+function updateCheckButtonState() {
+  const answerArea = document.getElementById('answerArea');
+  const currentAnswer = Array.from(answerArea.children).map(tile => tile.textContent).join(' ');
+  const checkButton = document.getElementById('checkButton');
+
+  if (currentAnswer !== lastCheckedAnswer && currentAnswer.trim() !== '') {
+    checkButton.disabled = false;
+    checkButton.style.opacity = '1';
+  } else {
+    checkButton.disabled = true;
+    checkButton.style.opacity = '0.5';
+  }
+}
+
+
+
+function checkAnswer() {
+  if (!canCheck) return;
+
+  const answerArea = document.getElementById('answerArea');
+  const userAnswer = Array.from(answerArea.children).map(tile => tile.textContent).join(' ');
+  const correctAnswer = currentGameSentences[currentSentenceIndex].primary;
+
+  lastCheckedAnswer = userAnswer;
+  canCheck = false;
+
+  const answerTiles = answerArea.querySelectorAll('.word-tile');
+
+  if (userAnswer === correctAnswer) {
+    playAudioMp3('right.mp3');
+    answerTiles.forEach(tile => {
+      tile.classList.add('jump');
+      setTimeout(() => tile.classList.remove('jump'), 300);
+    });
+    document.getElementById('checkButton').style.display = 'none';
+    document.getElementById('nextButton').style.display = 'inline-block';
+	document.getElementById('nextButton2').style.display = 'inline-block';
+	// if(currentGameSentences.length >=10 && currentSentenceIndex >= 1){
+	//    document.getElementById('endGameButton').style.display = 'block'; //當總題數超過10題才顯示;
+	//  }
+
+	correctAnswers++;
+  } else {
+    playAudioMp3('wrong.mp3');
+    answerTiles.forEach(tile => {
+      tile.classList.add('shake');
+      setTimeout(() => tile.classList.remove('shake'), 300);
+    });
+    canCheck = true;
+  }
+
+  updateCheckButtonState();
+}
+
+
+
+
+
+
+
 
 
     </script>
